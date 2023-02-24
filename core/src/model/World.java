@@ -51,6 +51,8 @@ public class World {
         OctaveGenerator noise = new PerlinOctaveGenerator(rng, 8);
 
         System.out.println("Generando superficie del mundo...");
+        int count = (int) Math.floor(Math.random() * (12 - 2 + 1) + 2);
+        Boolean activateSand = false;
         for (int x = 0; x < width; x++) {
             double heightLow = noise1.noise(x * 1.3, x * 1.3) / 6.0 - 4.0;
             double heightHigh = noise2.noise(x * 1.3, x * 1.3) / 5.0 + 6.0;
@@ -63,7 +65,19 @@ public class World {
             if (heightResult < 0.0)
                 heightResult = heightResult * 8.0 / 10.0;
             int heightBlock = (int) Math.floor(heightResult + 62);
-            map[1][heightBlock][x] = Material.GRASS.getId();
+
+            if(Math.random() > 0.95){
+                activateSand = true;
+            }
+            if(activateSand && count > 5){
+                map[1][heightBlock][x] = Material.SAND.getId();
+                count--;
+            }
+            else{
+                map[1][heightBlock][x] = Material.GRASS.getId();
+                count = (int) Math.floor(Math.random() * (12 - 2 + 1) + 2);
+                activateSand = false;
+            }
 
             for (int z=height - 1; z>=0 && z > heightBlock ; z--) {
                 double dirtThickness = noise.noise(x, z, 0.8, 2.0) / 24 - 4;
@@ -71,39 +85,90 @@ public class World {
                 if (z==SIZE - 1) map[1][z][x] = Material.Granite.getId();
                 else if (z > stoneTransition)
                     map[1][z][x] = Material.STONE.getId();
-                else // if (y <= dirtTransition)
+                else
                     map[1][z][x] = Material.DIRT.getId();
             }
         }
 
         System.out.println("Generando cuevas");
-        int SCALE = 30;
+        int SCALE = 20;
         int OCTAVES = 4;
         double PERSISTENCE = 0.5;
         double LACUNARITY = 2.0;
-        PerlinWorm perlinWorm = new PerlinWorm(width , height, SCALE, OCTAVES, PERSISTENCE, LACUNARITY);
+        double PROBABILITY = 0.3;
+        PerlinWorm perlinWorm = new PerlinWorm(width , height, SCALE, OCTAVES, PERSISTENCE, LACUNARITY, Material.SKY.getId(), PROBABILITY);
 
         int[][] grid = perlinWorm.getGrid();
         for (int x = 0; x < grid.length; x++) {
             for (int z = 0; z < grid[0].length; z++) {
-                if (grid[x][z] == 1 && map[1][z][x] != 0 && map[1][z][x] != 2 && map[1][z][x] != 1 && map[1][z][x] != 13) {
+                if (grid[x][z] == Material.SKY.getId() && map[1][z][x] != 0 && map[1][z][x] != 2 && map[1][z][x] != 1 && map[1][z][x] != 13 && map[1][z][x] != 7) {
                     map[1][z][x] = Material.SKY.getId();
                 }
             }
         }
+        System.out.println ("Generando lava");
+        SCALE = 10;
+        PROBABILITY = 0.55;
+        perlinWorm = new PerlinWorm(width , height, SCALE, OCTAVES, PERSISTENCE, LACUNARITY, Material.LAVA.getId(), PROBABILITY);
 
-        System.out.println ("Generando menas");
-        SCALE = 5;
-        OCTAVES = 4;
-        PERSISTENCE = 0.0001;
-        LACUNARITY = 1.0;
-        PerlinWorm perlinWorm2 = new PerlinWorm(width , height, SCALE, OCTAVES, PERSISTENCE, LACUNARITY);
-
-        grid = perlinWorm2.getGrid();
+        grid = perlinWorm.getGrid();
         for (int x = 0; x < grid.length; x++) {
             for (int z = 0; z < grid[0].length; z++) {
-                if (grid[x][z] == 1 && map[1][z][x] != 0 && map[1][z][x] != 2 && map[1][z][x] != 1 && map[1][z][x] != 13 && map[1][z][x] != 3) {
+                if (grid[x][z] == Material.LAVA.getId() && map[1][z][x] != 0 && map[1][z][x] != 2 && map[1][z][x] != 1 && map[1][z][x] != 13 && map[1][z][x] != 3 && map[1][z][x] != 7) {
+                    map[1][z][x] = Material.LAVA.getId();
+                    if(Math.random() > 0.88){
+                        map[1][z][x] = Material.OBSIDIAN.getId();
+                    }
+                }
+            }
+        }
+        System.out.println ("Generando menas");
+        SCALE = 4;
+        OCTAVES = 2;
+        PERSISTENCE = 0.0001;
+        LACUNARITY = 0.0000001;
+        PROBABILITY = 0.6;
+        PerlinWorm perlinWormOres = new PerlinWorm(width , height, SCALE, OCTAVES, PERSISTENCE, LACUNARITY, Material.IRON.getId(), PROBABILITY);
+
+        grid = perlinWormOres.getGrid();
+        for (int x = 0; x < grid.length; x++) {
+            for (int z = 0; z < grid[0].length; z++) {
+                if (grid[x][z] == Material.IRON.getId() && map[1][z][x] != 0 && map[1][z][x] != 2 && map[1][z][x] != 1 && map[1][z][x] != 13 && map[1][z][x] != 3 && map[1][z][x] != 7) {
                     map[1][z][x] = Material.IRON.getId();
+                }
+            }
+        }
+
+        perlinWormOres = new PerlinWorm(width , height, SCALE, OCTAVES, PERSISTENCE, LACUNARITY, Material.COPPER.getId(), PROBABILITY);
+
+        grid = perlinWormOres.getGrid();
+        for (int x = 0; x < grid.length; x++) {
+            for (int z = 0; z < grid[0].length; z++) {
+                if (grid[x][z] == Material.COPPER.getId() && map[1][z][x] != 0 && map[1][z][x] != 2 && map[1][z][x] != 1 && map[1][z][x] != 13 && map[1][z][x] != 3 && map[1][z][x] != 7) {
+                    map[1][z][x] = Material.COPPER.getId();
+                }
+            }
+        }
+
+        perlinWormOres = new PerlinWorm(width , height, SCALE, OCTAVES, PERSISTENCE, LACUNARITY, Material.COAL.getId(), PROBABILITY);
+
+        grid = perlinWormOres.getGrid();
+        for (int x = 0; x < grid.length; x++) {
+            for (int z = 0; z < grid[0].length; z++) {
+                if (grid[x][z] == Material.COAL.getId() && map[1][z][x] != 0 && map[1][z][x] != 2 && map[1][z][x] != 1 && map[1][z][x] != 13 && map[1][z][x] != 3 && map[1][z][x] != 7) {
+                    map[1][z][x] = Material.COAL.getId();
+                }
+            }
+        }
+
+        PROBABILITY = 0.8;
+        perlinWormOres = new PerlinWorm(width , height, SCALE, OCTAVES, PERSISTENCE, LACUNARITY, Material.DIAMOND.getId(), PROBABILITY);
+
+        grid = perlinWormOres.getGrid();
+        for (int x = 0; x < grid.length; x++) {
+            for (int z = 0; z < grid[0].length; z++) {
+                if (grid[x][z] == Material.DIAMOND.getId() && map[1][z][x] != 0 && map[1][z][x] != 2 && map[1][z][x] != 1 && map[1][z][x] != 13 && map[1][z][x] != 3 && map[1][z][x] != 7) {
+                    map[1][z][x] = Material.DIAMOND.getId();
                 }
             }
         }
@@ -133,6 +198,11 @@ public class World {
 
     public void dispose() {}
 
+
+    public String getId() {
+        return id;
+    }
+
     public Material getMaterialByCoordinate(int layer, int col, int row) {
         if (col < 0 || col >= getWidth() || row < 0 || row > getHeight() || getHeight() - 1 - row < 0)
             return null;
@@ -158,10 +228,10 @@ public class World {
 
 
     public static class PerlinWorm {
-
         private final int[][] grid;
 
-        public PerlinWorm(int width, int height, double scale, int octaves, double persistence, double lacunarity) {
+
+        public PerlinWorm(int width, int height, double scale, int octaves, double persistence, double lacunarity, int Value, double probability) {
             this.grid = new int[width][height];
 
             Random rng = new Random();
@@ -181,8 +251,8 @@ public class World {
                         amplitude *= persistence;
                         frequency *= lacunarity;
                     }
-                    if (noiseValue > 0.3) {
-                        this.grid[x][y] = 1;
+                    if (noiseValue > probability) {
+                        this.grid[x][y] = Value;
                     }
                 }
             }

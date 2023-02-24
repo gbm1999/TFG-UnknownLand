@@ -1,0 +1,187 @@
+
+textures.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+boss_jumping
+  rotate: false
+  xy: 180, 40
+  size: 18, 21
+  orig: 18, 21
+  offset: 0, 0
+  index: -1
+boss_stand
+  rotate: false
+  xy: 2, 2
+  size: 16, 21
+  orig: 16, 21
+  offset: 0, 0
+  index: -1
+bullet
+  rotate: false
+  xy: 156, 27
+  size: 11, 11
+  orig: 11, 11
+  offset: 0, 0
+  index: -1
+cactus1
+  rotate: false
+  xy: 2, 25
+  size: 15, 36
+  orig: 15, 36
+  offset: 0, 0
+  index: -1
+copper_coin
+  rotate: false
+  xy: 19, 25
+  size: 13, 13
+  orig: 13, 13
+  offset: 0, 0
+  index: -1
+fly1
+  rotate: false
+  xy: 200, 44
+  size: 21, 17
+  orig: 21, 17
+  offset: 0, 0
+  index: -1
+fly2
+  rotate: false
+  xy: 223, 44
+  size: 21, 17
+  orig: 21, 17
+  offset: 0, 0
+  index: -1
+gold_coin
+  rotate: false
+  xy: 34, 25
+  size: 13, 13
+  orig: 13, 13
+  offset: 0, 0
+  index: -1
+laser
+  rotate: false
+  xy: 169, 27
+  size: 11, 11
+  orig: 11, 11
+  offset: 0, 0
+  index: -1
+pink_jelly1
+  rotate: false
+  xy: 100, 18
+  size: 16, 8
+  orig: 16, 8
+  offset: 0, 0
+  index: -1
+pink_jelly2
+  rotate: false
+  xy: 138, 30
+  size: 16, 8
+  orig: 16, 8
+  offset: 0, 0
+  index: -1
+player_climb1
+  rotate: false
+  xy: 19, 40
+  size: 21, 21
+  orig: 21, 21
+  offset: 0, 0
+  index: -1
+player_climb2
+  rotate: false
+  xy: 42, 40
+  size: 21, 21
+  orig: 21, 21
+  offset: 0, 0
+  index: -1
+player_duck
+  rotate: false
+  xy: 65, 40
+  size: 21, 21
+  orig: 21, 21
+  offset: 0, 0
+  index: -1
+player_front
+  rotate: false
+  xy: 88, 40
+  size: 21, 21
+  orig: 21, 21
+  offset: 0, 0
+  index: -1
+player_hurt
+  rotate: false
+  xy: 111, 40
+  size: 21, 21
+  orig: 21, 21
+  offset: 0, 0
+  index: -1
+player_jumping
+  rotate: false
+  xy: 20, 2
+  size: 16, 21
+  orig: 16, 21
+  offset: 0, 0
+  index: -1
+player_stand
+  rotate: false
+  xy: 38, 2
+  size: 16, 21
+  orig: 16, 21
+  offset: 0, 0
+  index: -1
+player_walk1
+  rotate: false
+  xy: 64, 17
+  size: 16, 21
+  orig: 16, 21
+  offset: 0, 0
+  index: -1
+player_walk2
+  rotate: false
+  xy: 82, 17
+  size: 16, 21
+  orig: 16, 21
+  offset: 0, 0
+  index: -1
+player_walk3
+  rotate: false
+  xy: 134, 40
+  size: 21, 21
+  orig: 21, 21
+  offset: 0, 0
+  index: -1
+player_walk4
+  rotate: false
+  xy: 157, 40
+  size: 21, 21
+  orig: 21, 21
+  offset: 0, 0
+  index: -1
+silver_coin
+  rotate: false
+  xy: 49, 25
+  size: 13, 13
+  orig: 13, 13
+  offset: 0, 0
+  index: -1
+snail1
+  rotate: false
+  xy: 100, 28
+  size: 17, 10
+  orig: 17, 10
+  offset: 0, 0
+  index: -1
+snail2
+  rotate: false
+  xy: 119, 28
+  size: 17, 10
+  orig: 17, 10
+  offset: 0, 0
+  index: -1
+snail_hided
+  rotate: false
+  xy: 118, 17
+  size: 12, 9
+  orig: 12, 9
+  offset: 0, 0
+  index: -1
