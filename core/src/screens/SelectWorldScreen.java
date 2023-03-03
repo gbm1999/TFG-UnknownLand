@@ -83,7 +83,7 @@ public class SelectWorldScreen extends AbstractScreen{
 		        	@Override
 		        	public void clicked(InputEvent event, float x, float y) {
 		        		unknownLand.setSelectedWorld(auxWorld);
-		        		unknownLand.moveToSelectWorldScreen();
+		        		unknownLand.moveToGameScreen();
 		        	};
 		        });
 	        }else{

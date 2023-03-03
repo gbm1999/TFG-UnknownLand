@@ -36,8 +36,8 @@ public class LevelRenderer {
 	private OrthogonalTiledMapRenderer renderer;
 	private OrthographicCamera camera;
 	private float minCameraPositionX, minCameraPositionY, maxCameraPositionX, maxCameraPositionY;
-	
-	
+	private SpriteBatch sb;
+
 	TextureAtlas atlas;
 	/** Textures **/
     private TextureRegion playerIdleLeft;
@@ -73,25 +73,28 @@ public class LevelRenderer {
     private Animation snailRightAnimation;      
     
     private Float winAnimationStartTime = null;
+
+	private ArrayList<Enemy> enemyList;
 	
 	
 	
-	public LevelRenderer(Level level) {
-		renderer = new OrthogonalTiledMapRenderer(level.getMap());
+	public LevelRenderer(SpriteBatch sb, ArrayList<Enemy> creatures) {
+		//renderer = new OrthogonalTiledMapRenderer(level.getMap());
 		camera = new OrthographicCamera();
-		Player player = level.getPlayer();
+		//Player player = level.getPlayer();
 		
-		camera.viewportWidth = NUMBER_OF_TILES_X*level.getTileWidth();
-		camera.viewportHeight = NUMBER_OF_TILES_Y*level.getTileHeight();
+		//camera.viewportWidth = NUMBER_OF_TILES_X*level.getTileWidth();
+		//camera.viewportHeight = NUMBER_OF_TILES_Y*level.getTileHeight();
 		
 		minCameraPositionX = camera.viewportWidth/2;
-		maxCameraPositionX = level.getTotalWidth()*level.getTileWidth() - minCameraPositionX;
+		//maxCameraPositionX = level.getTotalWidth()*level.getTileWidth() - minCameraPositionX;
 		minCameraPositionY = camera.viewportHeight/2;
-		maxCameraPositionY = level.getTotalHeight()*level.getTileHeight() - minCameraPositionY;		
-		camera.position.x = player.getX();
-		camera.position.y = player.getY();
+		//maxCameraPositionY = level.getTotalHeight()*level.getTileHeight() - minCameraPositionY;
+		//camera.position.x = player.getX();
+		//camera.position.y = player.getY();
 		camera.update();
-		
+		this.sb = sb;
+		this.enemyList = creatures;
 		loadTextures();
 	}
 
@@ -171,14 +174,14 @@ public class LevelRenderer {
 		atlas.dispose();
 	}
 
-	public void render(Level level) {
-		if (!level.isLoaded()){
+	public void render() {
+		/*if (!level.isLoaded()){
 			return;
 		}
 		Player player = level.getPlayer();
 		float targetXPosition, targetYPosition;
 
-		targetXPosition = player.getX() + (player.getWidth()/2);	
+		targetXPosition = player.getX() + (player.getWidth()/2);
 		// we want the camera to be a little bit over the player
 		targetYPosition = player.getY() + (player.getHeight()/2);
 	
@@ -199,12 +202,10 @@ public class LevelRenderer {
 		
 		renderer.setView(camera);
 		renderer.render();
-		
-		SpriteBatch sb = (SpriteBatch) renderer.getBatch();
-
-		drawItems(sb, level.getItemList());
-		drawEnemies(sb, level.getEnemyList());
-		drawPlayerAndBullets(sb, player);
+*/
+		//drawItems(sb, level.getItemList());
+		drawEnemies();
+		//drawPlayerAndBullets(sb, player);
 		
 	}
 
@@ -229,8 +230,8 @@ public class LevelRenderer {
 		sb.end();
 	}
 
-	private void drawEnemies(SpriteBatch sb, ArrayList<Enemy> enemyList) {
-		sb.begin();
+	public void drawEnemies() {
+
 		for (Enemy enemy: enemyList){
 			boolean isDeadButVisible = !enemy.isAlive() && enemy.timeSinceDeath() < ANIMATION_DEATH_DURATION; 
 			
@@ -273,7 +274,7 @@ public class LevelRenderer {
 			}
 			
 		}
-		sb.end();
+
 		
 	}
 

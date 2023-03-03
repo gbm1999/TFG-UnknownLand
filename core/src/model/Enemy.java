@@ -3,11 +3,11 @@ package model;
 
 public abstract class Enemy extends RectangleCollider {
 	
-	public static final int JELLY = 1;
-	public static final int CACTUS = 2;
-	public static final int FLY = 3;
-	public static final int SNAIL = 4;
-	public static final int FIRST_BOSS = 5;
+	public static final int JELLY = 21;
+	public static final int CACTUS = 22;
+	public static final int FLY = 23;
+	public static final int SNAIL = 24;
+	public static final int FIRST_BOSS = 25;
 	
 	private int points;
 	private int enemyType;

@@ -9,15 +9,18 @@ import org.bukkit.util.noise.CombinedNoiseGenerator;
 import org.bukkit.util.noise.OctaveGenerator;
 import org.bukkit.util.noise.PerlinOctaveGenerator;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 import persistence.WorldMapProvider;
+import view.LevelRenderer;
 
 public class World {
 
     private String id;
     public int[][][] map;
     private TextureRegion[][] tiles;
+    private ArrayList<Enemy> creatures;
     private int width;
     private int height;
     long range = 1234567L;
@@ -28,6 +31,7 @@ public class World {
     public World(String id, int SIZE)
     {
         tiles = TextureRegion.split(new Texture("tiles.png"), Material.SIZE, Material.SIZE);
+        creatures = new ArrayList<>();
         width = SIZE * 8;
         height = SIZE;
         this.id = id;
@@ -102,7 +106,7 @@ public class World {
         for (int x = 0; x < grid.length; x++) {
             for (int z = 0; z < grid[0].length; z++) {
                 if (grid[x][z] == Material.SKY.getId() && map[1][z][x] != 0 && map[1][z][x] != 2 && map[1][z][x] != 1 && map[1][z][x] != 13 && map[1][z][x] != 7) {
-                    map[1][z][x] = Material.SKY.getId();
+                    map[1][z][x] = 0;
                 }
             }
         }
@@ -172,6 +176,18 @@ public class World {
                 }
             }
         }
+        System.out.println("Generando entidades e items...");
+        for (int x = 0; x < map.length; x++) {
+            for (int z = 0; z < map[0].length; z++) {
+                if(map[1][x][z] == 0){
+                    if (rng.nextDouble() < 0.75) // generamos Monster (75%) o Animal (25%) de las veces
+                        creatures.add(new JellyEnemy(z,x,width,height,1));
+                    else
+                        creatures.add(new CactusEnemy(z,x,width,height,1));
+                }
+            }
+        }
+
 
         return this;
     }
@@ -189,6 +205,9 @@ public class World {
                 }
             }
         }
+
+        LevelRenderer lv = new LevelRenderer(batch, creatures);
+        lv.drawEnemies();
         batch.end();
     }
 

@@ -13,6 +13,7 @@ import model.Material;
 import model.World;
 import screens.AbstractScreen;
 import screens.CreditsScreen;
+import screens.GameScreen;
 import screens.JoinHostGameScreen;
 import screens.MainMenuScreen;
 import screens.OptionsScreen;
@@ -29,6 +30,9 @@ public class UnknownLand extends Game {
 	JoinHostGameScreen joinHostGameScreen;
 	OptionsScreen optionsScreen;
 	CreditsScreen creditsScreen;
+	GameScreen gameScreen;
+
+
 	OrthographicCamera camera;
 	SpriteBatch batch;
 	private World world;
@@ -53,6 +57,7 @@ public class UnknownLand extends Game {
 		joinHostGameScreen = new JoinHostGameScreen(this);
 		optionsScreen = new OptionsScreen(this);
 		creditsScreen = new CreditsScreen(this);
+		gameScreen = new GameScreen(this);
 
 		Gdx.app.log( UnknownLand.LOG, "Creating game" );
 
@@ -116,6 +121,13 @@ public class UnknownLand extends Game {
 		Gdx.app.log( UnknownLand.LOG, "Setting screen: " + screen.getClass().getSimpleName() );
 	}
 
+	public void renderWorld(){
+		world.render(camera,batch);
+	}
+
+	public OrthographicCamera getCamera() {
+		return camera;
+	}
 
 	public void moveToSplashScreen() {
 		nextScreen = splashScreen;
@@ -139,6 +151,10 @@ public class UnknownLand extends Game {
 
 	public void moveToCreditsScreen() {
 		nextScreen = creditsScreen;
+	}
+
+	public void moveToGameScreen() {
+		nextScreen = gameScreen;
 	}
 
 	public void setSelectedWorld(World auxWorld) {

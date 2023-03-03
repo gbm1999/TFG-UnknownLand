@@ -17,8 +17,8 @@ public abstract class AbstractScreen implements Screen {
     private BitmapFont font;
     private Skin skin;
 	
-	public AbstractScreen(UnknownLand superMegaBuzz) {
-		this.unknownLand = superMegaBuzz;
+	public AbstractScreen(UnknownLand unknownLand) {
+		this.unknownLand = unknownLand;
 		this.stage = new Stage( new ScreenViewport());
 	}
 
