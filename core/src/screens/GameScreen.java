@@ -1,6 +1,7 @@
 package screens;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.math.Vector3;
 
@@ -33,6 +34,14 @@ public class GameScreen extends AbstractScreen {
 				System.out.println("Material: " + material.getId() + " " + material.getSymbol() +" " + position.x + " " + position.y);
 			}
 		}
+        if(Gdx.input.isKeyJustPressed(Input.Keys.A)){
+            System.out.println("Se mueve Izquierda");
+            unknownLand.getWorld().getPlayer().setX(unknownLand.getWorld().getPlayer().getX() + 1 );
+        }
+        if(Gdx.input.isKeyJustPressed(Input.Keys.D)){
+            System.out.println("Se mueve Derecha");
+            unknownLand.getWorld().getPlayer().setX(unknownLand.getWorld().getPlayer().getX() - 1 );
+        }
 
 
         this.unknownLand.renderWorld();

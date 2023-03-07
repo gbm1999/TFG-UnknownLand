@@ -16,7 +16,12 @@ public enum Material {
     OBSIDIAN(10, true, "Obsidian", 0),
     DIAMOND(11, true, "Diamond", 0),
     COAL(12, true, "Coal", 0),
-    Granite(13, true, "Granite", 0);
+    Granite(13, true, "Granite", 0),
+    JELLY(21, true, "Jelly", 0),
+    CACTUS(22, true, "Cactus", 0),
+    FLY(23, true, "Fly", 0),
+    SNAIL(24, true, "Snail", 0),
+    FIRST_BOSS(25, true, "First_boss", 0);
 
     public static final int SIZE = 16;
 
@@ -64,8 +69,9 @@ public enum Material {
         return (this.id > 13 && this.id <= 18);
     }
     public boolean isTool(){
-        return (this.id > 18);
+        return (this.id > 18 && this.id <= 20);
     }
+    public boolean isEnemy(){return (this.id > 20);}
     private static HashMap<Integer, Material> tileMap;
 
     static {

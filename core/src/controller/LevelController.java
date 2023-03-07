@@ -57,7 +57,7 @@ public class LevelController implements InputProcessor {
 	private float gravity;
 
 	private static final long TIME_TO_RESTART_LEVEL = 1000l;
-	private static final long TIME_TO_FINISH_LEVEL = (long) (LevelRenderer.ANIMATION_WIN_DURATION * 1500l);
+	//private static final long TIME_TO_FINISH_LEVEL = (long) (LevelRenderer.ANIMATION_WIN_DURATION * 1500l);
 
 	private Level level;
 	private TiledMapTileLayer collisionLayer;
@@ -121,8 +121,8 @@ public class LevelController implements InputProcessor {
 				askForLevelToRestart();
 			}
 			
-			if (player.getState().equals(State.WINNING) 
-					&& (System.currentTimeMillis() - timeOfFinish > TIME_TO_FINISH_LEVEL)) {
+			if (player.getState().equals(State.WINNING)){
+					//&& (System.currentTimeMillis() - timeOfFinish > TIME_TO_FINISH_LEVEL)) {
 				notifyLevelFinished();
 			}			
 		}
@@ -144,7 +144,7 @@ public class LevelController implements InputProcessor {
 		}
 
 		// simply updates the state time (animation)
-		player.update(delta);
+		//player.update(delta);
 		// simply updates timer
 		level.update(delta);
 	}

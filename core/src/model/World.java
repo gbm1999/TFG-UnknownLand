@@ -19,6 +19,8 @@ public class World {
 
     private String id;
     public int[][][] map;
+    Player player;
+    LevelRenderer lv;
     private TextureRegion[][] tiles;
     private ArrayList<Enemy> creatures;
     private int width;
@@ -32,6 +34,8 @@ public class World {
     {
         tiles = TextureRegion.split(new Texture("tiles.png"), Material.SIZE, Material.SIZE);
         creatures = new ArrayList<>();
+        player = new Player(50, 50, 1, 2);
+        lv = new LevelRenderer(player);
         width = SIZE * 8;
         height = SIZE;
         this.id = id;
@@ -83,6 +87,7 @@ public class World {
                 activateSand = false;
             }
 
+            System.out.println("Generando entidades e items...");
             for (int z=height - 1; z>=0 && z > heightBlock ; z--) {
                 double dirtThickness = noise.noise(x, z, 0.8, 2.0) / 24 - 4;
                 double stoneTransition = heightBlock - dirtThickness +5;
@@ -92,6 +97,10 @@ public class World {
                 else
                     map[1][z][x] = Material.DIRT.getId();
             }
+            if (rng.nextDouble() < 0.75) // generamos Monster (75%) o Animal (25%) de las veces
+                map[1][heightBlock - 1][x] = Material.JELLY.getId();
+            else
+                map[1][heightBlock - 1][x] = Material.CACTUS.getId();
         }
 
         System.out.println("Generando cuevas");
@@ -176,18 +185,6 @@ public class World {
                 }
             }
         }
-        System.out.println("Generando entidades e items...");
-        for (int x = 0; x < map.length; x++) {
-            for (int z = 0; z < map[0].length; z++) {
-                if(map[1][x][z] == 0){
-                    if (rng.nextDouble() < 0.75) // generamos Monster (75%) o Animal (25%) de las veces
-                        creatures.add(new JellyEnemy(z,x,width,height,1));
-                    else
-                        creatures.add(new CactusEnemy(z,x,width,height,1));
-                }
-            }
-        }
-
 
         return this;
     }
@@ -200,15 +197,16 @@ public class World {
             for (int row = 0; row < getHeight(); row++) {
                 for (int col = 0; col < getWidth(); col++) {
                     Material type = this.getMaterialByCoordinate(layer, col, row);
-                    if (type != null)
+                    if (type != null && !type.isEnemy())
                         batch.draw(tiles[0][type.getId() - 1], col * Material.SIZE, row * Material.SIZE);
+                    if (type != null && type.getId() == 21)
+                        batch.draw(tiles[0][11 - 1], col * Material.SIZE, row * Material.SIZE);
                 }
             }
         }
-
-        LevelRenderer lv = new LevelRenderer(batch, creatures);
-        lv.drawEnemies();
+        lv.render(player, batch);
         batch.end();
+
     }
 
     public void update(float delta) {
@@ -217,6 +215,9 @@ public class World {
 
     public void dispose() {}
 
+    public Player getPlayer() {
+        return player;
+    }
 
     public String getId() {
         return id;

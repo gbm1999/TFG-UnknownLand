@@ -1,17 +1,22 @@
 package model;
 
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
 
 import java.util.ArrayList;
 
 public class Player extends RectangleCollider{
 	
 	private final static int BASE_DAMAGE = 1;
+	public static final float WALK_FRAME_DURATION = 0.05F;
+	static final float WALK_SPEED = 0.05F;
+	static final float JUMP_SPEED = 0.05F;
 	
 	public enum State {
 		IDLE, WALKING, JUMPING, DYING, FALLING, WINNING
 	}		
-	
+
+	private Vector2 position;
 	private Vector2 velocity = new Vector2();
 	private Vector2 acceleration = new Vector2();
 	private State state = State.IDLE;
@@ -21,7 +26,8 @@ public class Player extends RectangleCollider{
 	
 	public Player(float x, float y, float tileWidth, float tileHeight){
 		super(x, y, 21*0.65f, 21*0.75f, tileWidth, tileHeight);
-		bulletList = new ArrayList<Bullet>();
+		position = new Vector2();
+		bulletList = new ArrayList<>();
 	}
 	
 	public Vector2 getVelocity() {
@@ -57,8 +63,17 @@ public class Player extends RectangleCollider{
 		this.facingLeft = b;
 	}
 
-    public void update(float delta) {
+    public void update(Body body, float delta, float accelX) {
         stateTime += delta;
+		position.x=body.getPosition().x;
+		position.y=body.getPosition().y;
+
+		velocity = body.getLinearVelocity();
+
+		if(accelX == -1) {
+			velocity.x = - WALK_SPEED;
+			this.state = State.WALKING;
+		}
     }
 
 	public float getStateTime() {

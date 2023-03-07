@@ -35,6 +35,11 @@ public class UnknownLand extends Game {
 
 	OrthographicCamera camera;
 	SpriteBatch batch;
+
+	public World getWorld() {
+		return world;
+	}
+
 	private World world;
 
 	private Level selectedLevel;
