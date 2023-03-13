@@ -6,7 +6,8 @@ import com.badlogic.gdx.physics.box2d.Body;
 import java.util.ArrayList;
 
 public class Player extends RectangleCollider{
-	
+
+	public static final int PLAYER = 50;
 	private final static int BASE_DAMAGE = 1;
 	public static final float WALK_FRAME_DURATION = 0.05F;
 	static final float WALK_SPEED = 0.05F;
@@ -73,6 +74,9 @@ public class Player extends RectangleCollider{
 		if(accelX == -1) {
 			velocity.x = - WALK_SPEED;
 			this.state = State.WALKING;
+		}
+		if(this.getState() == State.JUMPING){
+
 		}
     }
 

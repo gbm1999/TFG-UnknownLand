@@ -20,6 +20,7 @@ import model.FlyEnemy;
 import model.Item;
 import model.JellyEnemy;
 import model.Level;
+import model.Material;
 import model.Player;
 import model.Player.State;
 import model.RectangleCollider;
@@ -124,7 +125,7 @@ public class LevelRenderer {
 				keyFrame = player.isFacingLeft() ? playerJumpLeft : playerJumpRight;
 		}
 
-			sb.draw(keyFrame, player.getX(), player.getY(), player.getWidth(), player.getHeight());
+			sb.draw(keyFrame, player.getX() * Material.SIZE, player.getY() * Material.SIZE);
 
 	}
 }

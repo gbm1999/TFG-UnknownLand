@@ -8,8 +8,14 @@ import com.badlogic.gdx.math.Vector3;
 import net.gbm.unknowland.UnknownLand;
 
 import model.Material;
+import model.Player;
+
+
 
 public class GameScreen extends AbstractScreen {
+    private long jumpPressedTime;
+    private boolean jumpingPressed;
+    private long canJump;
 
     public GameScreen(UnknownLand unknownLand) {
         super(unknownLand);
@@ -34,13 +40,38 @@ public class GameScreen extends AbstractScreen {
 				System.out.println("Material: " + material.getId() + " " + material.getSymbol() +" " + position.x + " " + position.y);
 			}
 		}
-        if(Gdx.input.isKeyJustPressed(Input.Keys.A)){
+        if(Gdx.input.isKeyPressed(Input.Keys.D)){
             System.out.println("Se mueve Izquierda");
-            unknownLand.getWorld().getPlayer().setX(unknownLand.getWorld().getPlayer().getX() + 1 );
+            unknownLand.getWorld().getPlayer().setX(unknownLand.getWorld().getPlayer().getX() + 0.1f );
         }
-        if(Gdx.input.isKeyJustPressed(Input.Keys.D)){
+        if(Gdx.input.isKeyPressed(Input.Keys.A)){
             System.out.println("Se mueve Derecha");
-            unknownLand.getWorld().getPlayer().setX(unknownLand.getWorld().getPlayer().getX() - 1 );
+            unknownLand.getWorld().getPlayer().setX(unknownLand.getWorld().getPlayer().getX() - 0.1f );
+        }
+        if(Gdx.input.isKeyPressed(Input.Keys.SPACE)){
+            System.out.println("Se mueve Izquierda");
+           // unknownLand.getWorld().getPlayer().setY(unknownLand.getWorld().getPlayer().getY() + 1 );
+            unknownLand.getWorld().getPlayer().setY(unknownLand.getWorld().getPlayer().getY() + unknownLand.getWorld().getPlayer().getVelocity().y * delta);
+
+            if (unknownLand.getWorld().getPlayer().canJump()) { // player can jump if is not jumping or
+                // falling or dying
+                jumpingPressed = true;
+                jumpPressedTime = System.currentTimeMillis();
+                canJump = jumpPressedTime + 300l;
+                unknownLand.getWorld().getPlayer().setState(Player.State.JUMPING);
+                unknownLand.getWorld().getPlayer().getVelocity().y = 200f;
+            } else {
+                if (jumpingPressed
+                        && ((System.currentTimeMillis() - jumpPressedTime) >= 300l)) {
+                    jumpingPressed = false;
+                } else {
+                    if (jumpingPressed) {
+                        unknownLand.getWorld().getPlayer().getVelocity().y = 200f;
+                    }
+                }
+            }
+        } else {
+            jumpingPressed = false;
         }
 
 

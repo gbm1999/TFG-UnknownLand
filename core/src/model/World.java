@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Interpolation;
 
 import org.bukkit.util.noise.CombinedNoiseGenerator;
 import org.bukkit.util.noise.OctaveGenerator;
@@ -34,7 +35,7 @@ public class World {
     {
         tiles = TextureRegion.split(new Texture("tiles.png"), Material.SIZE, Material.SIZE);
         creatures = new ArrayList<>();
-        player = new Player(50, 50, 1, 2);
+        player = new Player(1000, 1000, 1, 2);
         lv = new LevelRenderer(player);
         width = SIZE * 8;
         height = SIZE;
@@ -186,9 +187,28 @@ public class World {
             }
         }
 
+        System.out.println ("Generando jugador");
+        player.setX(2);
+        player.setY(getMaxLocationAtX((int)player.getX()));
+
+
         return this;
     }
-
+    public int getMaxLocationAtX(int x){
+        int maxLocation = -1;
+        for (int layer = getLayers() -1 ; layer >= 0 ; layer--) {
+            for (int row = getHeight() - 1; row >= 0; row--) {
+                for (int col = getWidth() - 1; col >= 0; col--) {
+                    Material type = this.getMaterialByCoordinate(layer, col, row);
+                    if (type != null && type.getId() != 0 && x == col){
+                        maxLocation = row + 1;
+                        return maxLocation;
+                    }
+                }
+            }
+        }
+      return maxLocation;
+    }
     public void render(OrthographicCamera camera, SpriteBatch batch) {
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
