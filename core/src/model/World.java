@@ -98,10 +98,11 @@ public class World {
                 else
                     map[1][z][x] = Material.DIRT.getId();
             }
-            if (rng.nextDouble() < 0.75) // generamos Monster (75%) o Animal (25%) de las veces
-                map[1][heightBlock - 1][x] = Material.JELLY.getId();
+            if (rng.nextDouble() < 0.2) // generamos Monster (75%) o Animal (25%) de las veces
+                creatures.add(new JellyEnemy(x, getMaxLocationAtX(x), 1 , 1, 1));
             else
-                map[1][heightBlock - 1][x] = Material.CACTUS.getId();
+                creatures.add(new CactusEnemy(x, getMaxLocationAtX(x), 1 , 1, 1));
+
         }
 
         System.out.println("Generando cuevas");
@@ -190,25 +191,39 @@ public class World {
         System.out.println ("Generando jugador");
         player.setX(2);
         player.setY(getMaxLocationAtX((int)player.getX()));
-
-
+        for (int x = 0; x < grid.length; x++) {
+            creatures.add(new JellyEnemy(x, getEmptyLocationAtX(x), 1, 1, 1));
+        }
         return this;
     }
     public int getMaxLocationAtX(int x){
         int maxLocation = -1;
         for (int layer = getLayers() -1 ; layer >= 0 ; layer--) {
             for (int row = getHeight() - 1; row >= 0; row--) {
-                for (int col = getWidth() - 1; col >= 0; col--) {
-                    Material type = this.getMaterialByCoordinate(layer, col, row);
-                    if (type != null && type.getId() != 0 && x == col){
+                    Material type = this.getMaterialByCoordinate(layer, x, row);
+                    if (type != null && type.getId() != 0){
                         maxLocation = row + 1;
                         return maxLocation;
                     }
-                }
             }
         }
       return maxLocation;
     }
+
+    public int getEmptyLocationAtX(int x){
+        int maxLocation = getMaxLocationAtX(x) - 2;
+        for (int layer = getLayers() -1 ; layer >= 0 ; layer--) {
+                for (int row = maxLocation; row >= 0; row--) {
+                    Material type = this.getMaterialByCoordinate(layer, x, row);
+                    if (type != null && type.getId() == 0){
+                        maxLocation = row;
+                        return maxLocation;
+                    }
+            }
+        }
+        return 0;
+    }
+
     public void render(OrthographicCamera camera, SpriteBatch batch) {
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
@@ -217,14 +232,14 @@ public class World {
             for (int row = 0; row < getHeight(); row++) {
                 for (int col = 0; col < getWidth(); col++) {
                     Material type = this.getMaterialByCoordinate(layer, col, row);
-                    if (type != null && !type.isEnemy())
+                    if (type != null && !type.isEnemy() && type.getId() != 0)
                         batch.draw(tiles[0][type.getId() - 1], col * Material.SIZE, row * Material.SIZE);
                     if (type != null && type.getId() == 21)
                         batch.draw(tiles[0][11 - 1], col * Material.SIZE, row * Material.SIZE);
                 }
             }
         }
-        lv.render(player, batch);
+        lv.render(player,creatures, batch);
         batch.end();
 
     }

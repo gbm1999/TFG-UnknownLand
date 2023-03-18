@@ -34,11 +34,16 @@ public class LevelRenderer {
 	static Sprite playerJumpLeft;
 	static Sprite playerJumpRight;
 
+	private TextureRegion jellyFrame;
+
 	private Animation walkLeftAnimation;
 	private Animation walkRightAnimation;
 
-	static TextureAtlas atlas;
+	private Animation jellyLeftAnimation;
+	private Animation jellyRightAnimation;
 
+	static TextureAtlas atlas;
+	static TextureAtlas atlas2;
 	private OrthographicCamera camera;
 	private static final float LERP = 0.15f;
 	private float minCameraPositionX;
@@ -51,6 +56,7 @@ public class LevelRenderer {
 	}
 	public void load(Player player){
 		atlas = new TextureAtlas(Gdx.files.internal("gamesprites/playersprites/Player.pack"));
+		atlas2 = new TextureAtlas(Gdx.files.internal("gamesprites/jellysprites/jelly.pack"));
 		jump = atlas.createSprite("player1");
 		playerIdleRight = atlas.createSprite("player2");
 		playerIdleLeft = atlas.createSprite("player5");
@@ -70,6 +76,16 @@ public class LevelRenderer {
 		walkLeftAnimation = new Animation(Player.WALK_FRAME_DURATION, walkLeftFrames);
 		walkRightAnimation = new Animation(Player.WALK_FRAME_DURATION, walkRightFrames);
 
+		TextureRegion[] jellyRightFrames = new TextureRegion[2];
+		TextureRegion[] jellyLeftFrames = new TextureRegion[2];
+		for (int i = 0; i < 2; i++) {
+			jellyLeftFrames[i] = atlas2.findRegion("jelly" + (i+1) );
+			jellyRightFrames[i] = new TextureRegion(jellyLeftFrames[i]);
+			jellyRightFrames[i].flip(true, false);
+		}
+		jellyLeftAnimation = new Animation(0.30f, jellyLeftFrames);
+		jellyRightAnimation = new Animation(0.30f, jellyRightFrames);
+
 		camera = new OrthographicCamera();
 
 		camera.viewportWidth = 50;
@@ -85,7 +101,7 @@ public class LevelRenderer {
 
 	}
 
-	public void render(Player player, SpriteBatch sb) {
+	public void render(Player player,ArrayList<Enemy> enemies, SpriteBatch sb) {
 
 		float targetXPosition, targetYPosition;
 
@@ -109,6 +125,7 @@ public class LevelRenderer {
 		camera.update();
 
 		drawPlayer(player, sb);
+		drawEnemies(sb, enemies);
 
 	}
 	public static void dispose() {
@@ -126,6 +143,42 @@ public class LevelRenderer {
 		}
 
 			sb.draw(keyFrame, player.getX() * Material.SIZE, player.getY() * Material.SIZE);
+
+	}
+
+	private void drawEnemies(SpriteBatch sb, ArrayList<Enemy> enemyList) {
+		for (Enemy enemy: enemyList){
+			boolean isDeadButVisible = !enemy.isAlive() && enemy.timeSinceDeath() < 1f;
+
+			if (isDeadButVisible){
+				animationDeath(enemy);
+			}else if (!enemy.isAlive()){
+				continue;
+			}
+
+			if(enemy instanceof JellyEnemy){
+				JellyEnemy jellyEnemy = (JellyEnemy) enemy;
+				jellyFrame = (TextureRegion) (jellyEnemy.isMovingLeft()?jellyLeftAnimation.getKeyFrame(jellyEnemy.getStateTime(),true):jellyRightAnimation.getKeyFrame(jellyEnemy.getStateTime(),true));
+				sb.draw(jellyFrame, jellyEnemy.getX() * Material.SIZE, jellyEnemy.getY() * Material.SIZE, jellyEnemy.getWidth()/2, jellyEnemy.getHeight()/2, jellyEnemy.getWidth(), jellyEnemy.getHeight(),1f,1f,jellyEnemy.getRotation());
+			}
+			else{
+
+			}
+		}
+
+	}
+
+	private void animationDeath(RectangleCollider dyingEntity) {
+		float oldWidth = dyingEntity.getWidth();
+		float oldHeight= dyingEntity.getHeight();
+		float newWidth = dyingEntity.getWidth()*.94f;
+		float newHeight = dyingEntity.getHeight()*.94f;
+
+		dyingEntity.setX(dyingEntity.getX() + ((oldWidth  - newWidth)  / 2));
+		dyingEntity.setY(dyingEntity.getY() + ((oldHeight - newHeight) / 2));
+		dyingEntity.setWidth(newWidth);
+		dyingEntity.setHeight(newHeight);
+		dyingEntity.setRotation(dyingEntity.getRotation() + 20f);
 
 	}
 }

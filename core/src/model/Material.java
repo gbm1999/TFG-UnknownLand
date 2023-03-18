@@ -3,7 +3,7 @@ package model;
 import java.util.HashMap;
 
 public enum Material {
-
+    AIR(0, true, "Grass", 0),
     GRASS(1, true, "Grass", 0),
     DIRT(2, true, "Dirt", 0),
     SKY(3, true, "Sand", 0),
