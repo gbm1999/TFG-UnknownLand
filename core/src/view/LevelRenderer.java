@@ -135,7 +135,7 @@ public class LevelRenderer {
 	public void drawPlayer(Player player, SpriteBatch sb) {
 		TextureRegion keyFrame = LevelRenderer.playerIdleRight;
 
-			keyFrame = player.isFacingLeft() ? playerIdleLeft : playerIdleRight;
+		keyFrame = (TextureRegion) (player.isFacingLeft() ? walkLeftAnimation.getKeyFrame(player.getStateTime(), true) : walkRightAnimation.getKeyFrame(player.getStateTime(), true));
 		if(player.getState().equals(Player.State.WALKING)) {
 			keyFrame = (TextureRegion) (player.isFacingLeft() ? walkLeftAnimation.getKeyFrame(player.getStateTime(), true) : walkRightAnimation.getKeyFrame(player.getStateTime(), true));
 		} else if (player.getState().equals(State.JUMPING) || player.getState().equals(State.FALLING)) {

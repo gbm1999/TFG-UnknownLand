@@ -21,6 +21,7 @@ import model.Player;
 import model.Player.State;
 import model.RectangleCollider;
 import model.SnailEnemy;
+import model.World;
 import view.LevelRenderer;
 
 import java.util.ArrayList;
@@ -59,7 +60,7 @@ public class LevelController implements InputProcessor {
 	private static final long TIME_TO_RESTART_LEVEL = 1000l;
 	//private static final long TIME_TO_FINISH_LEVEL = (long) (LevelRenderer.ANIMATION_WIN_DURATION * 1500l);
 
-	private Level level;
+	private World level;
 	private TiledMapTileLayer collisionLayer;
 
 	private long jumpPressedTime;
@@ -88,7 +89,7 @@ public class LevelController implements InputProcessor {
 		keys.put(Keys.CONTROL_LEFT, false); // FIRE
 	}
 
-	public LevelController(Level level) {
+	public LevelController(World level) {
 		this.level = level;
 		this.damp = level.getDamp();
 		this.gravity = level.getGravity();

@@ -64,20 +64,8 @@ public class Player extends RectangleCollider{
 		this.facingLeft = b;
 	}
 
-    public void update(Body body, float delta, float accelX) {
-        stateTime += delta;
-		position.x=body.getPosition().x;
-		position.y=body.getPosition().y;
-
-		velocity = body.getLinearVelocity();
-
-		if(accelX == -1) {
-			velocity.x = - WALK_SPEED;
-			this.state = State.WALKING;
-		}
-		if(this.getState() == State.JUMPING){
-
-		}
+    public void update(float delta) {
+			stateTime += delta;
     }
 
 	public float getStateTime() {
