@@ -11,7 +11,7 @@ import com.badlogic.gdx.utils.JsonValue;
 
 import java.util.ArrayList;
 
-public class Level implements Serializable{
+public class Level{
 	
 	// The only really needed properties to render a level
 	private String mapFile;
@@ -30,6 +30,7 @@ public class Level implements Serializable{
 	private float timeElapsed;
 	private int score;
 	private boolean loaded;
+	private World world;
 	
 	// Game progress related properties (persisted properties)
 	private int levelNumber;
@@ -46,21 +47,22 @@ public class Level implements Serializable{
 		this.loaded = false;
 	}
 	
-	public Level(String mapFile, float damp, float gravity) {
+	public Level(String mapFile, float damp, float gravity, World world) {
 		this.mapFile = mapFile;
 		this.loaded = false;
 		this.damp = damp;
 		this.gravity = gravity;
+		this.world = world;
 	}	
 	
 	public void loadLevel(){
 		this.map = new TmxMapLoader().load(mapFile);
-		tileWidth = ((TiledMapTileLayer) map.getLayers().get(0)).getTileWidth();
-		tileHeight = ((TiledMapTileLayer) map.getLayers().get(0)).getTileHeight();
-		totalWidth = ((TiledMapTileLayer) map.getLayers().get(0)).getWidth();
-		totalHeight = ((TiledMapTileLayer) map.getLayers().get(0)).getHeight();
+		tileWidth = world.getWidth();
+		tileHeight = world.getHeight();
+		totalWidth = tileWidth;
+		totalHeight = tileHeight;
 		
-		this.player = new Player(2 * getTileWidth(), 3 * getTileHeight(), getTileWidth(), getTileHeight());
+		//this.player = new Player(2 * getTileWidth(), 3 * getTileHeight());
 		this.enemyList = new ArrayList<Enemy>();
 		this.itemList = new ArrayList<Item>();
 		
@@ -82,7 +84,7 @@ public class Level implements Serializable{
 	
 	public void restartLevel(){
 		Gdx.app.log(getClass().getName(), "Level Restarting...");
-		player = new Player(2 * getTileWidth(), 3 * getTileHeight(), getTileWidth(), getTileHeight());
+		//player = new Player(2 * getTileWidth(), 3 * getTileHeight());
 		
 		enemyList.clear();
 		itemList.clear();
@@ -121,17 +123,17 @@ public class Level implements Serializable{
 							newEnemy = new CactusEnemy(x*tileWidth, y*tileHeight, tileWidth, tileHeight, points);
 							break;
 						case Enemy.FIRST_BOSS:
-							newEnemy = new FirstBoss(x*tileWidth, y*tileHeight, tileWidth, tileHeight, points);
+							newEnemy = new FirstBoss(x*tileWidth, y*tileHeight , points);
 							break;
 						case Enemy.FLY:
-							newEnemy = new FlyEnemy(x*tileWidth, y*tileHeight, tileWidth, tileHeight, points);
+							newEnemy = new FlyEnemy(x*tileWidth, y*tileHeight , points);
 							break;
 						case Enemy.SNAIL:
-							newEnemy = new SnailEnemy(x*tileWidth, y*tileHeight, tileWidth, tileHeight, points);
+							newEnemy = new SnailEnemy(x*tileWidth, y*tileHeight, points);
 							break;
 						case Enemy.JELLY:
 						default:
-							newEnemy = new JellyEnemy(x*tileWidth, y*tileHeight, tileWidth, tileHeight, points);
+							newEnemy = new JellyEnemy(x*tileWidth, y*tileHeight, points);
 							break;
 					}
 					enemyList.add(newEnemy);
@@ -141,25 +143,6 @@ public class Level implements Serializable{
 		
 	}
 
-	public Player getPlayer() {
-		return player;
-	}
-	
-	public void setPlayer(Player player) {
-		this.player = player;
-	}
-	
-	public TiledMap getMap() {
-		return map;
-	}
-	
-	public void setMap(TiledMap map) {
-		this.map = map;
-	}
-
-	public void dispose() {
-		map.dispose();
-	}
 
 	public float getTileWidth() {
 		return tileWidth;
@@ -175,34 +158,6 @@ public class Level implements Serializable{
 
 	public void setTileHeight(float tileHeight) {
 		this.tileHeight = tileHeight;
-	}
-
-	public float getTotalWidth() {
-		return totalWidth;
-	}
-
-	public void setTotalWidth(float totalWidth) {
-		this.totalWidth = totalWidth;
-	}
-
-	public float getTotalHeight() {
-		return totalHeight;
-	}
-
-	public void setTotalHeight(float totalHeight) {
-		this.totalHeight = totalHeight;
-	}
-
-	public ArrayList<Enemy> getEnemyList() {
-		return enemyList;
-	}
-
-	public ArrayList<Item> getItemList() {
-		return itemList;
-	}
-
-	public float getTimeElapsed() {
-		return timeElapsed;
 	}
 
 	public int getScore() {
@@ -267,29 +222,8 @@ public class Level implements Serializable{
 
 	public void setGravity(float gravity){
 		this.gravity = gravity;
-	}	
-
-	@Override
-	public void write(Json json) {
-		json.writeValue("levelNumber", levelNumber);
-		json.writeValue("completed", completed);
-		json.writeValue("highScore", highScore);
-		json.writeValue("bestTime", bestTime);
-		json.writeValue("mapFile", mapFile);
-		json.writeValue("damp", damp);
-		json.writeValue("gravity", gravity);
 	}
 
-	@Override
-	public void read(Json json, JsonValue jsonData) {
-		levelNumber = json.readValue("levelNumber", Integer.class, jsonData);
-		completed = json.readValue("completed", Boolean.class, jsonData);
-		highScore = json.readValue("highScore", Integer.class, jsonData);
-		bestTime = json.readValue("bestTime", Float.class, jsonData);
-		mapFile = json.readValue("mapFile", String.class, jsonData);
-		damp = json.readValue("damp", Float.class, jsonData);
-		gravity = json.readValue("gravity", Float.class, jsonData);
-	}
-	
+
 }
 

@@ -21,6 +21,9 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 
 import controller.LevelController;
+import model.Material;
+import model.Player;
+import model.World;
 
 
 import net.gbm.unknowland.UnknownLand;
@@ -40,7 +43,12 @@ public class GameScreen extends AbstractScreen {
     private boolean pause = false;
     private Label hiScoreLabel;
     private Label summaryScoreLabel;
-
+    private ClickListener exitClickListener = new ClickListener() {
+        @Override
+        public void clicked(InputEvent event, float x, float y) {
+            unknownLand.moveToMainMenuScreen();
+        };
+    };
 
     public GameScreen(UnknownLand unknownLand) {
         super(unknownLand);
@@ -78,7 +86,7 @@ public class GameScreen extends AbstractScreen {
         //the following code clears the screen with the given RGB color (black)
         Gdx.gl.glClearColor( 0f, 0f, 0f, 0f );
         Gdx.gl.glClear( GL20.GL_COLOR_BUFFER_BIT );
-        super.render(delta);
+
 
 
         levelController.update(delta);
@@ -88,16 +96,28 @@ public class GameScreen extends AbstractScreen {
 
         updateLabels();
 
-
         super.render(delta);
-        //Table.drawDebug(stage);
 
+        setTableVisibility(tableSummary,true);
+
+        this.unknownLand.getCamera().position.set(this.unknownLand.getSelectedWorld().getPlayer().getX() * Material.SIZE, this.unknownLand.getSelectedWorld().getPlayer().getY() * Material.SIZE, 0);
+        this.unknownLand.getCamera().update();
+
+        if (Gdx.input.justTouched()){
+            Vector3 position = this.unknownLand.getCamera().unproject(new Vector3(Gdx.input.getX() , Gdx.input.getY(), 0));
+            Material material = this.unknownLand.getSelectedWorld().getMaterialByLocation(1, position.x, position.y);
+            if (material != null){
+                System.out.println("Material: " + material.getId() + " " + material.getSymbol() +" " + position.x + " " + position.y);
+            }
+            System.out.println(this.unknownLand.getSelectedWorld().getPlayer().getX() + " " + this.unknownLand.getSelectedWorld().getPlayer().getY());
+        }
 
     }
 
     private void setTableVisibility(Table targetTable, boolean visibility){
         targetTable.setVisible(visibility);
     }
+
 
     // Here we will create the UI elements like: time, score, pause button
     private Table createUITopTable() {
@@ -110,9 +130,9 @@ public class GameScreen extends AbstractScreen {
         resultTable.setFillParent(true);
         resultTable.left().top();
 
-        timeAvailableLabel = new Label("Time: "+"10", skin);
+        timeAvailableLabel = new Label("Time: "+10, skin);
         timeAvailableLabel.setWidth(200);
-        scoreLabel = new Label("Score: "+"10", skin);
+        scoreLabel = new Label("Score: "+10, skin);
         // button Pause
         Drawable imagePause = new TextureRegionDrawable(new TextureRegion(new Texture("images/pause_ui.png")));
         ImageButton pauseButton = new ImageButton( imagePause );
@@ -256,7 +276,7 @@ public class GameScreen extends AbstractScreen {
 
         // button Exit
         TextButton exitButton = new TextButton( "Exit Game", skin );
-        //exitButton.addListener( exitClickListener );
+        exitButton.addListener( exitClickListener );
 
 
         resultTable.add(pauseMenuLabel);
@@ -293,11 +313,11 @@ public class GameScreen extends AbstractScreen {
         summaryMenuLabel.setColor(Color.BLACK);
         summaryMenuLabel.setAlignment(Align.center);
 
-        summaryScoreLabel = new Label("Score: "+10, skin);
+        summaryScoreLabel = new Label("Score: "+0, skin);
         summaryScoreLabel.setColor(Color.BLACK);
         summaryScoreLabel.setAlignment(Align.center);
 
-        hiScoreLabel = new Label("Hi-Score: "+10, skin);
+        hiScoreLabel = new Label("Hi-Score: "+0, skin);
         hiScoreLabel.setColor(Color.BLACK);
         hiScoreLabel.setAlignment(Align.center);
 
@@ -305,7 +325,15 @@ public class GameScreen extends AbstractScreen {
         Drawable imageNextLevel = new TextureRegionDrawable(new TextureRegion(new Texture("images/next_ui.png")));
         ImageButton nextLevelButton = new ImageButton( imageNextLevel );
         nextLevelButton.addListener( new ClickListener() {
-
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                World aux = unknownLand.getSelectedWorld();
+                if (aux != null){
+                    setTableVisibility(tableSummary,false);
+                }else{
+                    unknownLand.moveToSelectWorldScreen();
+                }
+            };
         } );
 
         // button restart
@@ -322,6 +350,7 @@ public class GameScreen extends AbstractScreen {
         // button Exit
         Drawable imageExit = new TextureRegionDrawable(new TextureRegion(new Texture("images/exit_ui.png")));
         ImageButton exitButton = new ImageButton( imageExit );
+        exitButton.addListener( exitClickListener );
 
 
         resultTable.add(summaryMenuLabel).colspan(3);
@@ -342,6 +371,7 @@ public class GameScreen extends AbstractScreen {
     protected void togglePause() {
         this.pause = !this.pause ;
         setTableVisibility(tablePause, pause);
+
     }
 
     @Override
@@ -353,12 +383,11 @@ public class GameScreen extends AbstractScreen {
     public void dispose(){
         super.dispose();
     }
-
     private void updateLabels() {
-        timeAvailableLabel.setText("Time: "+String.format("%03.0f","10"));
-        scoreLabel.setText("Score: "+String.format("%06d","10"));
-        summaryScoreLabel.setText("Score: "+String.format("%06d","10"));
-        hiScoreLabel.setText("Hi-Score: "+String.format("%06d","10"));
+        timeAvailableLabel.setText("Time: "+10);
+        scoreLabel.setText("Score: "+10);
+        summaryScoreLabel.setText("Score: "+10);
+        hiScoreLabel.setText("Hi-Score: "+10);
     }
 
 

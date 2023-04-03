@@ -17,7 +17,7 @@ public class CactusEnemy extends Enemy {
 	private List<Bullet> bulletList;
 
 	public CactusEnemy(float x, float y,float tileWidth, float tileHeight, int points) {
-		super(x, y, ENEMY_SIZE_X, ENEMY_SIZE_Y, tileWidth, tileHeight, Enemy.CACTUS, points, CactusEnemy.LIFE);
+		super(x, y, ENEMY_SIZE_X, ENEMY_SIZE_Y, Enemy.CACTUS, points, CactusEnemy.LIFE);
 		bulletList = new ArrayList<Bullet>();
 	}
 	

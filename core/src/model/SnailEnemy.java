@@ -10,8 +10,8 @@ public class SnailEnemy extends MovingEnemy {
 	
 	private float resurrectionTime;
 	
-	public SnailEnemy(float x, float y, float tileWidth, float tileHeight, int points) {
-		super(x, y,ENEMY_SIZE * 1.5f, ENEMY_SIZE, tileWidth, tileHeight, Enemy.SNAIL, points, SnailEnemy.LIFE);
+	public SnailEnemy(float x, float y, int points) {
+		super(x, y,ENEMY_SIZE * 1.5f, ENEMY_SIZE, Enemy.SNAIL, points, SnailEnemy.LIFE);
 	}
 
 	@Override

@@ -11,7 +11,7 @@ public class Bullet extends RectangleCollider{
 	private Vector2 velocity = new Vector2();
 	
 	public Bullet(float x, float y, float tileWidth, float tileHeight, float velocityX, float velocityY) {
-		super(x, y, bullet_size, bullet_size, tileWidth, tileHeight);
+		super(x, y, bullet_size, bullet_size);
 		this.velocity.x = velocityX;
 		this.velocity.y = velocityY;
 	}

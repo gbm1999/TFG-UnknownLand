@@ -8,9 +8,9 @@ public abstract class MovingEnemy extends Enemy {
 	protected Vector2 velocity = new Vector2();		
 
 	public MovingEnemy(float x, float y, float sizeX, float sizeY,
-			float tileWidth, float tileHeight, int enemyType, int points,
+			 int enemyType, int points,
 			int life) {
-		super(x, y, sizeX, sizeY, tileWidth, tileHeight, enemyType, points, life);
+		super(x, y, sizeX, sizeY, enemyType, points, life);
 		this.velocity.x = -this.speed();
 		movingLeft = true;
 	}

@@ -6,21 +6,17 @@ public class RectangleCollider {
 	protected float y;
 	protected float width;
 	protected float height;
-	protected float incrementX;
-	protected float incrementY;
 	protected float rotation;
-	private float tileWidth,tileHeight;
+	public boolean grounded;
+	public float velocityY = 0;
 
-	public RectangleCollider(float x, float y, float width, float height, float tileWidth, float tileHeight) {
+	public RectangleCollider(float x, float y, float width, float height) {
 		this.x = x;
 		this.y = y;
 		this.width = width;
 		this.height = height;
-		this.incrementY = this.height > tileHeight ? tileHeight/2 : this.height/2;
-		this.incrementX = this.width > tileWidth ? tileWidth/2 : this.width/2;
 		this.rotation = 0;
-		this.tileHeight = tileHeight;
-		this.tileWidth = tileWidth;
+		grounded = true;
 	}
 	
 	public float getX() {
@@ -47,12 +43,6 @@ public class RectangleCollider {
 	public void setHeight(float height) {
 		this.height = height;
 	}
-	public float getIncrementX() {
-		return incrementX;
-	}
-	public float getIncrementY() {
-		return incrementY;
-	}	
 	
 	public boolean collidesWith(RectangleCollider rectangleCollider2){
 		
@@ -100,12 +90,5 @@ public class RectangleCollider {
 		return (float) Math.hypot(this.x-other.x, this.y-other.y);
 	}
 
-	public float getTileWidth() {
-		return tileWidth;
-	}
-
-	public float getTileHeight() {
-		return tileHeight;
-	}
 	
 }

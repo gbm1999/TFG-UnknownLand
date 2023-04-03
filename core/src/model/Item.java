@@ -14,7 +14,7 @@ public class Item extends RectangleCollider{
 	
 	public Item(float x, float y, float tileWidth, float tileHeight, int itemType, int points) {
 		
-		super(x + ((tileWidth - ITEM_SIZE) / 2), y + ((tileHeight - ITEM_SIZE) / 2), ITEM_SIZE, ITEM_SIZE, tileWidth, tileHeight);
+		super(x + ((tileWidth - ITEM_SIZE) / 2), y + ((tileHeight - ITEM_SIZE) / 2), ITEM_SIZE, ITEM_SIZE);
 		
 		this.points = points;
 		this.active = true;

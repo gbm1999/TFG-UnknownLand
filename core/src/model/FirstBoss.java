@@ -26,8 +26,8 @@ public class FirstBoss extends Enemy {
 	
 	private List<Bullet> bulletList;
 
-	public FirstBoss(float x, float y, float tileWidth, float tileHeight, int points) {
-		super(x, y, ENEMY_SIZE_X, ENEMY_SIZE_Y, tileWidth, tileHeight, Enemy.FIRST_BOSS, points, FirstBoss.LIFE);
+	public FirstBoss(float x, float y, int points) {
+		super(x, y, ENEMY_SIZE_X, ENEMY_SIZE_Y, Enemy.FIRST_BOSS, points, FirstBoss.LIFE);
 		bulletList = new ArrayList<Bullet>();
 	}
 	

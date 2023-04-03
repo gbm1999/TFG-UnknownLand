@@ -5,18 +5,21 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Interpolation;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
 
 import org.bukkit.util.noise.CombinedNoiseGenerator;
 import org.bukkit.util.noise.OctaveGenerator;
 import org.bukkit.util.noise.PerlinOctaveGenerator;
 
+import com.badlogic.gdx.utils.Json.Serializable;
 import java.util.ArrayList;
 import java.util.Random;
 
 import persistence.WorldMapProvider;
 import view.LevelRenderer;
 
-public class World {
+public class World  implements Serializable {
 
     private String id;
     public int[][][] map;
@@ -26,16 +29,18 @@ public class World {
     private ArrayList<Enemy> creatures;
     private int width;
     private int height;
+    private float timeElapsed = 0;
     long range = 1234567L;
     Random r = new Random();
 
     private final long seed = (long)(r.nextDouble()*range);
+    private int score;
 
     public World(String id, int SIZE)
     {
         tiles = TextureRegion.split(new Texture("tiles.png"), Material.SIZE, Material.SIZE);
         creatures = new ArrayList<>();
-        player = new Player(1000, 1000, 1, 2);
+        player = new Player(1000, 1000);
         lv = new LevelRenderer(player);
         width = SIZE * 8;
         height = SIZE;
@@ -99,7 +104,7 @@ public class World {
                     map[1][z][x] = Material.DIRT.getId();
             }
             if (rng.nextDouble() < 0.2) // generamos Monster (75%) o Animal (25%) de las veces
-                creatures.add(new JellyEnemy(x, getMaxLocationAtX(x), 1 , 1, 1));
+                creatures.add(new JellyEnemy(x, getMaxLocationAtX(x), 1 ));
             else
                 creatures.add(new CactusEnemy(x, getMaxLocationAtX(x), 1 , 1, 1));
 
@@ -192,7 +197,7 @@ public class World {
         player.setX(2);
         player.setY(getMaxLocationAtX((int)player.getX()));
         for (int x = 0; x < grid.length; x++) {
-            creatures.add(new JellyEnemy(x, getEmptyLocationAtX(x), 1, 1, 1));
+            creatures.add(new JellyEnemy(x, getEmptyLocationAtX(x),  1));
         }
         return this;
     }
@@ -224,6 +229,19 @@ public class World {
         return 0;
     }
 
+    public boolean doesRectCollideWithMap(float x, float y, int width, int height) {
+        if (x < 0 || y < 0 || x + width > getPixelWidth() || y + height > getPixelHeight())
+            return true;
+
+        for (int layer = getLayers() -1 ; layer >= 0 ; layer--) {
+                Material type = getMaterialByCoordinate(layer, (int)x, (int)y);
+                if (type != null && type.isCollidable())
+                    return true;
+        }
+
+        return false;
+    }
+
     public void render(OrthographicCamera camera, SpriteBatch batch) {
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
@@ -245,7 +263,7 @@ public class World {
     }
 
     public void update(float delta) {
-        update(delta);
+        timeElapsed += delta;
     }
 
     public void dispose() {}
@@ -276,6 +294,13 @@ public class World {
     }
     public int getLayers() {
         return map.length;
+    }
+    public int getPixelWidth() {
+        return this.getWidth() * Material.SIZE;
+    }
+
+    public int getPixelHeight() {
+        return this.getHeight() * Material.SIZE;
     }
     public long getSeed() {
         return seed;
@@ -354,5 +379,40 @@ public class World {
         public int[][] getGrid() {
             return this.grid;
         }
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    public void increaseScore(int amount){
+        score += amount;
+    }
+
+    public ArrayList<Enemy> getEnemyList(){
+        return creatures;
+    }
+
+
+    @Override
+    public void write(Json json) {
+        json.writeValue("id", id);
+        json.writeValue("map", map);
+        json.writeValue("player", player);
+        json.writeValue("LevelRenderer", lv);
+        json.writeValue("tiles", tiles);
+        json.writeValue("width", width);
+        json.writeValue("height", height);
+    }
+
+    @Override
+    public void read(Json json, JsonValue jsonData) {
+        id = json.readValue("id", String.class, jsonData);
+        map = json.readValue("map", int[][][].class, jsonData);
+        player = json.readValue("player", Player.class, jsonData);
+        lv = json.readValue("LevelRenderer", LevelRenderer.class, jsonData);
+        tiles = json.readValue("tiles", TextureRegion[][].class, jsonData);
+        width = json.readValue("width", int.class, jsonData);
+        width = json.readValue("width", int.class, jsonData);
     }
 }

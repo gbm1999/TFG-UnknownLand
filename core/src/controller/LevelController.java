@@ -1,6 +1,7 @@
 package controller;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.audio.Sound;
@@ -52,16 +53,13 @@ public class LevelController implements InputProcessor {
 
 	// Acceleration applied to the player when moving left or right
 	private static final float ACCELERATION = 750f;
-	
-	// We use this variable in order to stop the player smoothly
-	private float damp;
-	private float gravity;
 
 	private static final long TIME_TO_RESTART_LEVEL = 1000l;
 	//private static final long TIME_TO_FINISH_LEVEL = (long) (LevelRenderer.ANIMATION_WIN_DURATION * 1500l);
 
 	private World level;
-	private TiledMapTileLayer collisionLayer;
+	private Player player;
+	private ArrayList<Enemy> creatures;
 
 	private long jumpPressedTime;
 	private boolean jumpingPressed;
@@ -91,65 +89,66 @@ public class LevelController implements InputProcessor {
 
 	public LevelController(World level) {
 		this.level = level;
-		this.damp = level.getDamp();
-		this.gravity = level.getGravity();
-		this.collisionLayer = (TiledMapTileLayer) level.getMap().getLayers().get("colisiones");
-		mapHeight = collisionLayer.getHeight() * collisionLayer.getTileHeight();
-		mapWidth = collisionLayer.getWidth() * collisionLayer.getTileWidth();
+		mapHeight = level.getHeight();
+		mapWidth = level.getWidth();
 		levelNeedRestart = false;
+		player = level.getPlayer();
+		creatures = level.getEnemyList();
 	}
 
 	public void update(float delta) {
-		Player player = level.getPlayer();
-		processInput();
 
-		// Setting initial vertical acceleration
-		player.getAcceleration().y = gravity;
-
-		// Convert acceleration to frame time
-		player.getAcceleration().scl(delta);
-
-		// apply acceleration to change velocity
-		player.getVelocity().add(player.getAcceleration().x,
-				player.getAcceleration().y);
-
-		if (player.isAlive()) {
-			moveAndCollidePlayer(delta);
-			checkItemsPickedUp(delta);
-		} else {
-			if (player.getState().equals(State.DYING) 
-					&& (System.currentTimeMillis() - timeOfDeath > TIME_TO_RESTART_LEVEL)) {
-				askForLevelToRestart();
-			}
-			
-			if (player.getState().equals(State.WINNING)){
-					//&& (System.currentTimeMillis() - timeOfFinish > TIME_TO_FINISH_LEVEL)) {
-				notifyLevelFinished();
-			}			
-		}
-		moveAndCollideBullets(delta);
-		moveAndUpdateEnemies(delta);
-
-		if (player.getAcceleration().x == 0) {
-			// When we are not applying any acceleration to the player
-			// we apply damping to halt the player nicely
-			player.getVelocity().x *= damp;
+		movePlayer (player,delta);
+		for (Enemy entity : creatures) {
+			updateEntity(entity, delta, -9.8f);
 		}
 
-		// ensure terminal velocity is not exceeded
-		if (player.getVelocity().x > MAX_SPEED) {
-			player.getVelocity().x = MAX_SPEED;
-		}
-		if (player.getVelocity().x < -MAX_SPEED) {
-			player.getVelocity().x = -MAX_SPEED;
-		}
-
-		// simply updates the state time (animation)
-		//player.update(delta);
 		// simply updates timer
 		level.update(delta);
 	}
+	private void updateEntity(RectangleCollider rectangleCollider,float deltaTime, float gravity){
+		float newY = rectangleCollider.getY();
 
+		rectangleCollider.velocityY += gravity * deltaTime * rectangleCollider.getWidth();
+		newY += rectangleCollider.velocityY * deltaTime;
+
+		if (level.doesRectCollideWithMap(rectangleCollider.getX() + 0.4f, newY, (int)rectangleCollider.getWidth(), (int)rectangleCollider.getHeight())) {
+			if (rectangleCollider.velocityY < 0) {
+				rectangleCollider.setY((float) Math.floor(rectangleCollider.getY()));
+				rectangleCollider.grounded = true;
+			}
+			rectangleCollider.velocityY = 0;
+		} else {
+			rectangleCollider.setY(newY);
+			rectangleCollider.grounded = false;
+		}
+	}
+	protected void movePlayer (Player player,float deltaTime) {
+		if (Gdx.input.isKeyPressed(Input.Keys.SPACE) && player.grounded)
+			player.velocityY += player.JUMP_VELOCITY * player.getWidth();
+		else if (Gdx.input.isKeyPressed(Input.Keys.SPACE) && !player.grounded && player.velocityY > 0)
+			player.velocityY += player.JUMP_VELOCITY * player.getWidth() * deltaTime;
+
+		updateEntity(player,deltaTime,-9.8f);//Apply gravity
+
+		if (Gdx.input.isKeyPressed(Input.Keys.LEFT))
+			moveEntity(player,-player.SPEED * deltaTime , false);
+
+		if (Gdx.input.isKeyPressed(Input.Keys.RIGHT))
+			moveEntity(player,0.6f + player.SPEED * deltaTime , true);
+	}
+
+	protected void moveEntity (RectangleCollider rectangleCollider,float amount, boolean type) {
+		float newX = rectangleCollider.getX() + amount;
+		float val = 0;
+		if (type){
+			val = -0.6f;
+		}
+		if (!level.doesRectCollideWithMap(newX, rectangleCollider.getY(), (int)rectangleCollider.getWidth(), (int)rectangleCollider.getHeight()))
+
+			rectangleCollider.setX(newX + val);
+	}
+/*
 	private void moveAndUpdateEnemies(float delta) {
 		Player player = level.getPlayer();
 		ArrayList<Enemy> enemies = level.getEnemyList();
@@ -184,7 +183,7 @@ public class LevelController implements InputProcessor {
 	private void moveAndUpdateFirstBoss(FirstBoss firstBoss, Player player, float delta) {
 		//IA
 		if (firstBoss.distanceTo(player) < firstBoss.getActionRadius()){
-			firstBoss.shoot(player.getX()+player.getWidth()/2, player.getY()+player.getHeight()/2,this.level.getTileHeight(),this.level.getTileHeight());
+			firstBoss.shoot(player.getX()+player.getWidth()/2, player.getY()+player.getHeight()/2,this.level.getHeight(),this.level.getHeight());
 		}
 		
 		// Setting initial vertical acceleration
@@ -206,7 +205,7 @@ public class LevelController implements InputProcessor {
 				firstBoss.getWidth(), firstBoss.getHeight(),
 				firstBoss.getIncrementX());
 		
-		if (Math.abs(oldY-firstBoss.getY()) > this.level.getTileHeight()){
+		if (Math.abs(oldY-firstBoss.getY()) > this.level.getHeight()){
 			collisionY = true;
 		}
 		
@@ -245,7 +244,7 @@ public class LevelController implements InputProcessor {
 	private void moveAndUpdateCactusEnemy(CactusEnemy cactusEnemy, Player player, float delta) {
 		//IA
 		if (cactusEnemy.distanceTo(player) < cactusEnemy.getActionRadius()){
-			cactusEnemy.shoot(player.getX()+player.getHeight()/2, player.getY()+player.getWidth()/2,this.level.getTileHeight(),this.level.getTileHeight());
+			cactusEnemy.shoot(player.getX()+player.getHeight()/2, player.getY()+player.getWidth()/2,this.level.getHeight(),this.level.getHeight());
 		}
 	}
 	
@@ -290,20 +289,6 @@ public class LevelController implements InputProcessor {
 		}
 		flyEnemy.changeFlyDirectionIfNeeded();
 	}
-	
-	private boolean checkFall(MovingEnemy enemy) {
-		return ((enemy.isMovingLeft() && !isCellBlocked(enemy.getX(),
-				enemy.getY() - 2)) || (!enemy.isMovingLeft() && !isCellBlocked(
-				enemy.getX() + enemy.getWidth(), enemy.getY() - 2)));
-	}
-
-	private boolean checkWalls(MovingEnemy enemy) {
-		return ((enemy.isMovingLeft() && collidesLeft(enemy.getX(),
-				enemy.getY(), enemy.getWidth(), enemy.getHeight(),
-				enemy.getIncrementY())) || (!enemy.isMovingLeft() && collidesRight(
-				enemy.getX(), enemy.getY(), enemy.getWidth(),
-				enemy.getHeight(), enemy.getIncrementY())));
-	}
 
 	private void killPlayer() {
 		Player player = level.getPlayer();
@@ -314,33 +299,9 @@ public class LevelController implements InputProcessor {
 			Gdx.app.log( LevelController.class.getName(), "Killing Player!" );
 		}
 	}
-	
-	private void moveToNextLevel() {
-		Player player = level.getPlayer();
-		if (level.getScore() > level.getHighScore()){
-			level.setHighScore(level.getScore());
-		}
-		if (level.getTimeElapsed() > level.getBestTime()){
-			level.setBestTime(level.getTimeElapsed());
-		}
-		timeOfFinish = System.currentTimeMillis();
-		player.setState(State.WINNING);
-		warpSound.play();
-		Gdx.app.log( LevelController.class.getName(), "Player won!" );
-	}	
 
-	private void checkItemsPickedUp(float delta) {
-		Player player = level.getPlayer();
-		ArrayList<Item> items = level.getItemList();
-		for (Item item : items) {
-			if (item.isActive() && player.collidesWith(item)) {
-				level.increaseScore(item.getPoints());
-				item.setActive(false);
-				coinSound.play();
-			}
-		}
 
-	}
+
 
 	private void moveAndCollideBullets(float delta) {
 		Player player = level.getPlayer();
@@ -403,10 +364,6 @@ public class LevelController implements InputProcessor {
 			killPlayer();
 			return;
 		}
-		if (checkCellWithPropertyCollisionX(player, velocity, "levelEnd")){
-			moveToNextLevel();
-			return;
-		}
 
 		// if collided we go back
 		if (collisionX) {
@@ -423,10 +380,6 @@ public class LevelController implements InputProcessor {
 			killPlayer();
 			return;
 		}
-		if (checkCellWithPropertyCollisionY(player, velocity, "levelEnd")){
-			moveToNextLevel();
-			return;			
-		}		
 
 		if (collisionY) {
 			//Gdx.app.log( SuperMegaBuzz.LOG, "Player can't move in the Y direction" );
@@ -445,11 +398,11 @@ public class LevelController implements InputProcessor {
 		}
 
 	}
-
+*/
 	private void processInput() {
 		Player player = level.getPlayer();
-		float tileHeight = level.getTileHeight();
-		float tileWidth = level.getTileWidth();
+		float tileHeight = level.getHeight();
+		float tileWidth = level.getWidth();
 		// jumping logic
 		if (keys.get(Keys.SPACE)) {
 			if (player.canJump()) { // player can jump if is not jumping or
@@ -522,227 +475,10 @@ public class LevelController implements InputProcessor {
 		}
 	}
 
-	private boolean checkPlayerCollisionY(Vector2 velocity) {
-		Player player = level.getPlayer();		
-		boolean collisionY = false;
-		if (velocity.y < 0) {
-			collisionY = collidesBottom(player.getX(), player.getY(),
-					player.getWidth(), player.getHeight(),
-					player.getIncrementX());
-		} else if (velocity.y > 0) {
-			collisionY = collidesTop(player.getX(), player.getY(),
-					player.getWidth(), player.getHeight(),
-					player.getIncrementX());
-		}
-		return collisionY;
-	}
-
-	private boolean checkPlayerCollisionX(Vector2 velocity) {
-		Player player = level.getPlayer();		
-		boolean collisionX = false;
-		if (velocity.x < 0) {
-			collisionX = collidesLeft(player.getX(), player.getY(),
-					player.getWidth(), player.getHeight(),
-					player.getIncrementY());
-		} else if (velocity.x > 0) {
-			collisionX = collidesRight(player.getX(), player.getY(),
-					player.getWidth(), player.getHeight(),
-					player.getIncrementY());
-		}
-		return collisionX;
-	}
-
-	public boolean collidesRight(float x, float y, float objectWidth,
-			float objectHeight, float increment) {
-		for (float step = 0; step <= objectHeight; step += increment)
-			if (isCellBlocked(x + objectWidth, y + step))
-				return true;
-		return false;
-	}
-
-	public boolean collidesLeft(float x, float y, float objectWidth,
-			float objectHeight, float increment) {
-		for (float step = 0; step <= objectHeight; step += increment)
-			if (isCellBlocked(x, y + step))
-				return true;
-		return false;
-	}
-
-	public boolean collidesTop(float x, float y, float objectWidth,
-			float objectHeight, float increment) {
-		for (float step = 0; step <= objectWidth; step += increment)
-			if (isCellBlocked(x + step, y + objectHeight))
-				return true;
-		return false;
-	}
-
-	public boolean collidesBottom(float x, float y, float objectWidth,
-			float objectHeight, float increment) {
-		for (float step = 0; step <= objectWidth; step += increment)
-			if (isCellBlocked(x + step, y))
-				return true;
-		return false;
-	}
-
-	private boolean isCellBlocked(float x, float y) {
-		float tileHeight = level.getTileHeight();
-		float tileWidth = level.getTileWidth();		
-		if (outSideMap(x, y)) {
-			return true;
-		}
-		Cell cellToCheck = collisionLayer.getCell((int) (x / tileWidth),
-				(int) (y / tileHeight));
-		if (cellToCheck != null && cellToCheck.getTile() != null)
-			return cellToCheck.getTile().getProperties().containsKey("blocked");
-		else
-			return false;
-	}
-
-	private boolean outSideMap(float x, float y) {
-		if ((x > mapWidth) || (x < 0))
-			return true;
-		else if ((y > mapHeight) || (y < 0))
-			return true;
-		else
-			return false;
-	}
-	
-	private boolean checkCellWithPropertyCollisionY(RectangleCollider entity, Vector2 velocity, String property) {
-		boolean collisionY = false;
-		if (velocity.y < 0) {
-			collisionY = collidesBottomCellWithProperty(entity.getX(), entity.getY(),
-					entity.getWidth(), entity.getHeight(),
-					entity.getIncrementX(), property);
-		} else if (velocity.y > 0) {
-			collisionY = collidesTopCellWithProperty(entity.getX(), entity.getY(),
-					entity.getWidth(), entity.getHeight(),
-					entity.getIncrementX(), property);
-		}
-		return collisionY;
-	}	
-	
-	private boolean checkCellWithPropertyCollisionX(RectangleCollider entity, Vector2 velocity, String property) {			
-		boolean collisionX = false;
-		if (velocity.x < 0) {
-			collisionX = collidesLeftCellWithProperty(entity.getX(), entity.getY(),
-					entity.getWidth(), entity.getHeight(),
-					entity.getIncrementY(), property);
-		} else if (velocity.x > 0) {
-			collisionX = collidesRightCellWithProperty(entity.getX(), entity.getY(),
-					entity.getWidth(), entity.getHeight(),
-					entity.getIncrementY(), property);
-		}
-		return collisionX;
-	}
-
-	private boolean collidesRightCellWithProperty(float x, float y, float width,
-			float height, float incrementY , String property) {
-		float[] offsets;
-		for (float step = 0; step <= height; step += incrementY) {
-			offsets = getCellOffsets(x + width, y + step);
-			if (doesCellHaveProperty(x + width, y + step, offsets[0], offsets[1], offsets[2], offsets[3], property))
-				return true;
-		}
-		return false;
-	}
-
-	private boolean collidesLeftCellWithProperty(float x, float y, float width,
-			float height, float incrementY, String property) {
-		float[] offsets;
-		for (float step = 0; step <= height; step += incrementY) {
-			offsets = getCellOffsets(x, y + step);
-			if (doesCellHaveProperty(x, y + step, offsets[0], offsets[1], offsets[2], offsets[3], property))
-				return true;
-		}
-		return false;
-	}
-
-	private boolean collidesTopCellWithProperty(float x, float y, float width,
-			float height, float incrementX, String property) {
-		float[] offsets;
-		for (float step = 0; step <= width; step += incrementX) {
-			offsets = getCellOffsets(x + step, y + height);
-			if (doesCellHaveProperty(x + step, y + height, offsets[0], offsets[1], offsets[2], offsets[3], property))
-				return true;
-		}
-		return false;
-	}
-
-	private boolean collidesBottomCellWithProperty(float x, float y, float width,
-			float height, float incrementX, String property) {
-		float[] offsets;
-		for (float step = 0; step <= width; step += incrementX) {
-			offsets = getCellOffsets(x + step, y);
-			if (doesCellHaveProperty(x + step, y, offsets[0], offsets[1], offsets[2], offsets[3], property))
-				return true;
-		}
-		return false;
-	}
-
-	private float[] getCellOffsets(float x, float y) {
-		float tileHeight = level.getTileHeight();
-		float tileWidth = level.getTileWidth();			
-		float[] offsets = {0,0,0,0};
-		Cell cellToCheck = collisionLayer.getCell((int) (x / tileWidth),
-				(int) (y / tileHeight));
-		if (cellToCheck != null && cellToCheck.getTile() != null) {
-			MapProperties mapProperties = cellToCheck.getTile().getProperties();
-			try{
-				offsets[0] = Float.parseFloat((String) mapProperties
-						.get("topOffset"));
-				offsets[1] = Float.parseFloat((String) mapProperties
-						.get("rightOffset"));
-				offsets[2] = Float.parseFloat((String) mapProperties
-						.get("bottomOffset"));
-				offsets[3] = Float.parseFloat((String) mapProperties
-						.get("leftOffset"));
-			}catch(Exception ex){
-				//Gdx.app.log(SuperMegaBuzz.LOG, "Cell does not have offsets defined or there was a problem loading the offsets, returning zero offsets");
-				offsets[0] = 0;
-				offsets[1] = 0;
-				offsets[2] = 0;
-				offsets[3] = 0;
-			}
-		}
-		return offsets;
-	}
-
-	private boolean doesCellHaveProperty(float x, float y, float offsetTop, float offsetRight, float offsetBottom, float offsetLeft, String property) {
-		float tileHeight = level.getTileHeight();
-		float tileWidth = level.getTileWidth();			
-		int indexCellX = (int) (x / tileWidth);
-		int indexCellY = (int) (y / tileHeight);
-		Cell cellToCheck = collisionLayer.getCell(indexCellX,indexCellY);
-		if (cellToCheck != null && cellToCheck.getTile() != null) {
-			MapProperties mapProperties = cellToCheck.getTile().getProperties();
-			if (mapProperties.containsKey(property)) {
-				float floatCellX = indexCellX*tileWidth;
-				float floatCellY = indexCellY*tileHeight;
-				RectangleCollider cellCollider = new RectangleCollider(floatCellX+offsetLeft, floatCellY+offsetBottom, 
-													 tileWidth-offsetRight, tileHeight-offsetTop, tileWidth, tileHeight);
-				if (cellCollider.isPointInsideRectangle(x,y))
-					return true;
-				else
-					return false;
-			} else {
-				return false;
-			}
-		} else{
-			return false;
-		}
-	}
 
 	private void askForLevelToRestart() {
 		Gdx.app.log(getClass().getName(), "Asking for Level to Restart");
 		this.levelNeedRestart = true;
-	}
-
-	public void levelRestarted(){
-		this.levelNeedRestart = false;
-	}
-	
-	public boolean getLevelNeedRestart() {
-		return levelNeedRestart;
 	}
 	
 	private void notifyLevelFinished() {

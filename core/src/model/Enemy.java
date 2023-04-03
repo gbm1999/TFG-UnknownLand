@@ -15,9 +15,9 @@ public abstract class Enemy extends RectangleCollider {
 	private float timeOfDeath = 0;
 	private float stateTime = 0;
 
-	public Enemy(float x, float y, float sizeX, float sizeY, float tileWidth, float tileHeight, int enemyType, int points, int life) {
+	public Enemy(float x, float y, float sizeX, float sizeY, int enemyType, int points, int life) {
 		
-		super(x,y,sizeX,sizeY,tileWidth,tileHeight);
+		super(x,y,sizeX,sizeY);
 
 		this.enemyType = enemyType;
 		this.points = points;

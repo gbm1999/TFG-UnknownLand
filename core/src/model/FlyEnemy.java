@@ -8,8 +8,8 @@ public class FlyEnemy extends MovingEnemy {
 	
 	private float nextFlyDirectionChange;
 	
-	public FlyEnemy(float x, float y, float tileWidth, float tileHeight, int points) {
-		super(x, y,ENEMY_SIZE * 1.5f, ENEMY_SIZE, tileWidth, tileHeight, Enemy.FLY, points, FlyEnemy.LIFE);
+	public FlyEnemy(float x, float y, int points) {
+		super(x, y,ENEMY_SIZE * 1.5f, ENEMY_SIZE, Enemy.FLY, points, FlyEnemy.LIFE);
 	}
 	
 	public void changeFlyDirectionIfNeeded(){
