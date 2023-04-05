@@ -124,17 +124,17 @@ public class LevelController implements InputProcessor {
 		}
 	}
 	protected void movePlayer (Player player,float deltaTime) {
-		if (Gdx.input.isKeyPressed(Input.Keys.SPACE) && player.grounded)
+		if (keys.get(Keys.SPACE) && player.grounded)
 			player.velocityY += player.JUMP_VELOCITY * player.getWidth();
-		else if (Gdx.input.isKeyPressed(Input.Keys.SPACE) && !player.grounded && player.velocityY > 0)
+		else if (keys.get(Keys.SPACE) && !player.grounded && player.velocityY > 0)
 			player.velocityY += player.JUMP_VELOCITY * player.getWidth() * deltaTime;
 
 		updateEntity(player,deltaTime,-9.8f);//Apply gravity
 
-		if (Gdx.input.isKeyPressed(Input.Keys.LEFT))
+		if (keys.get(Keys.LEFT))
 			moveEntity(player,-player.SPEED * deltaTime , false);
 
-		if (Gdx.input.isKeyPressed(Input.Keys.RIGHT))
+		if (keys.get(Keys.RIGHT))
 			moveEntity(player,0.6f + player.SPEED * deltaTime , true);
 	}
 

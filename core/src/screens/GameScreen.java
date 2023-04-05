@@ -4,6 +4,7 @@ import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
@@ -43,18 +44,24 @@ public class GameScreen extends AbstractScreen {
     private boolean pause = false;
     private Label hiScoreLabel;
     private Label summaryScoreLabel;
+    Music mp3Music;
     private ClickListener exitClickListener = new ClickListener() {
         @Override
         public void clicked(InputEvent event, float x, float y) {
+            mp3Music.stop();
+            mp3Music.dispose();
+            mp3Music = null;
             unknownLand.moveToMainMenuScreen();
         };
     };
 
     public GameScreen(UnknownLand unknownLand) {
         super(unknownLand);
-        create();
+        show();
     }
-    private void create(){
+    @Override
+    public void show(){
+        super.show();
         levelController = new LevelController(this.unknownLand.getWorld());
         // create the table actors
         tableUITop = createUITopTable();
@@ -80,6 +87,16 @@ public class GameScreen extends AbstractScreen {
         multiplexer.addProcessor(stage);
         multiplexer.addProcessor(levelController);
         Gdx.input.setInputProcessor(multiplexer);
+
+        if (mp3Music != null){
+            mp3Music.stop();
+            mp3Music.dispose();
+            mp3Music = null;
+        }
+        mp3Music = Gdx.audio.newMusic(Gdx.files.internal(getRandomMusic()));
+        mp3Music.setLooping(true);
+        mp3Music.play();
+        pause = false;
     }
     @Override
     public void render(float delta) {
@@ -87,10 +104,7 @@ public class GameScreen extends AbstractScreen {
         Gdx.gl.glClearColor( 0f, 0f, 0f, 0f );
         Gdx.gl.glClear( GL20.GL_COLOR_BUFFER_BIT );
 
-
-
         levelController.update(delta);
-
 
         this.unknownLand.renderWorld();
 
@@ -98,7 +112,7 @@ public class GameScreen extends AbstractScreen {
 
         super.render(delta);
 
-        setTableVisibility(tableSummary,true);
+        //setTableVisibility(tableSummary,false);
 
         this.unknownLand.getCamera().position.set(this.unknownLand.getSelectedWorld().getPlayer().getX() * Material.SIZE, this.unknownLand.getSelectedWorld().getPlayer().getY() * Material.SIZE, 0);
         this.unknownLand.getCamera().update();
@@ -131,7 +145,7 @@ public class GameScreen extends AbstractScreen {
         resultTable.left().top();
 
         timeAvailableLabel = new Label("Time: "+10, skin);
-        timeAvailableLabel.setWidth(200);
+        timeAvailableLabel.setWidth(100);
         scoreLabel = new Label("Score: "+10, skin);
         // button Pause
         Drawable imagePause = new TextureRegionDrawable(new TextureRegion(new Texture("images/pause_ui.png")));
@@ -310,15 +324,15 @@ public class GameScreen extends AbstractScreen {
 
 
         Label summaryMenuLabel = new Label("Level Finished!", skin);
-        summaryMenuLabel.setColor(Color.BLACK);
+        summaryMenuLabel.setColor(Color.GOLD);
         summaryMenuLabel.setAlignment(Align.center);
 
         summaryScoreLabel = new Label("Score: "+0, skin);
-        summaryScoreLabel.setColor(Color.BLACK);
+        summaryScoreLabel.setColor(Color.GOLD);
         summaryScoreLabel.setAlignment(Align.center);
 
         hiScoreLabel = new Label("Hi-Score: "+0, skin);
-        hiScoreLabel.setColor(Color.BLACK);
+        hiScoreLabel.setColor(Color.GOLD);
         hiScoreLabel.setAlignment(Align.center);
 
         // button Next Level
@@ -382,6 +396,9 @@ public class GameScreen extends AbstractScreen {
     @Override
     public void dispose(){
         super.dispose();
+        mp3Music.stop();
+        mp3Music.dispose();
+        mp3Music = null;
     }
     private void updateLabels() {
         timeAvailableLabel.setText("Time: "+10);
