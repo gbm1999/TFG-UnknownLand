@@ -1,0 +1,12 @@
+
+Cactus.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+New Piskel-1.png
+  rotate: false
+  xy: 0, 0
+  size: 21, 24
+  orig: 32, 32
+  offset: 5, 5
+  index: -1

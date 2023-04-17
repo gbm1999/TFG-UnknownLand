@@ -13,6 +13,7 @@ public class Player extends RectangleCollider{
 	public static final float WALK_FRAME_DURATION = 0.05F;
 	public static final int SPEED = 5;
 	public static final int JUMP_VELOCITY = 2;
+	public static int HEALTH = 20;
 	
 	public enum State {
 		IDLE, WALKING, JUMPING, DYING, FALLING, WINNING
@@ -65,10 +66,6 @@ public class Player extends RectangleCollider{
 		this.facingLeft = b;
 	}
 
-	public void update(float deltaTime, float gravity) {
-
-	}
-
 	public float getStateTime() {
 		return stateTime;
 	}
@@ -92,6 +89,14 @@ public class Player extends RectangleCollider{
 	
 	public int getDamage(){
 		return Player.BASE_DAMAGE;
+	}
+
+	public static int getHEALTH() {
+		return HEALTH;
+	}
+
+	public static void setHEALTH(int HEALTH) {
+		Player.HEALTH = HEALTH;
 	}
 
 }

@@ -402,7 +402,7 @@ public class GameScreen extends AbstractScreen {
     }
     private void updateLabels() {
         timeAvailableLabel.setText("Time: "+10);
-        scoreLabel.setText("Score: "+10);
+        scoreLabel.setText("Live: " + this.unknownLand.getWorld().getPlayer().getHEALTH());
         summaryScoreLabel.setText("Score: "+10);
         hiScoreLabel.setText("Hi-Score: "+10);
     }

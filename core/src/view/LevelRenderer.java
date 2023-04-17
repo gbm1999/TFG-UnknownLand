@@ -35,6 +35,7 @@ public class LevelRenderer {
 	static Sprite playerJumpRight;
 
 	private TextureRegion jellyFrame;
+	private TextureRegion cactusFrame;
 
 	private Animation walkLeftAnimation;
 	private Animation walkRightAnimation;
@@ -44,6 +45,7 @@ public class LevelRenderer {
 
 	static TextureAtlas atlas;
 	static TextureAtlas atlas2;
+	static TextureAtlas atlas3;
 	private OrthographicCamera camera;
 	private static final float LERP = 0.15f;
 	private float minCameraPositionX;
@@ -57,6 +59,7 @@ public class LevelRenderer {
 	public void load(Player player){
 		atlas = new TextureAtlas(Gdx.files.internal("gamesprites/playersprites/Player.pack"));
 		atlas2 = new TextureAtlas(Gdx.files.internal("gamesprites/jellysprites/jelly.pack"));
+		atlas3 = new TextureAtlas(Gdx.files.internal("gamesprites/cactussprites/Cactus.pack"));
 		jump = atlas.createSprite("player1");
 		playerIdleRight = atlas.createSprite("player2");
 		playerIdleLeft = atlas.createSprite("player5");
@@ -85,6 +88,11 @@ public class LevelRenderer {
 		}
 		jellyLeftAnimation = new Animation(0.30f, jellyLeftFrames);
 		jellyRightAnimation = new Animation(0.30f, jellyRightFrames);
+
+		cactusFrame = new TextureRegion();
+		cactusFrame = atlas3.findRegion("New Piskel-1.png");
+
+
 
 		camera = new OrthographicCamera();
 
@@ -158,11 +166,12 @@ public class LevelRenderer {
 
 			if(enemy instanceof JellyEnemy){
 				JellyEnemy jellyEnemy = (JellyEnemy) enemy;
-				jellyFrame = (TextureRegion) (jellyEnemy.isMovingLeft()?jellyLeftAnimation.getKeyFrame(jellyEnemy.getStateTime(),true):jellyRightAnimation.getKeyFrame(jellyEnemy.getStateTime(),true));
+				jellyFrame = (TextureRegion) (jellyEnemy.isMovingRight()?jellyLeftAnimation.getKeyFrame(jellyEnemy.getStateTime(),true):jellyRightAnimation.getKeyFrame(jellyEnemy.getStateTime(),true));
 				sb.draw(jellyFrame, jellyEnemy.getX() * Material.SIZE, jellyEnemy.getY() * Material.SIZE, jellyEnemy.getWidth()/2, jellyEnemy.getHeight()/2, jellyEnemy.getWidth(), jellyEnemy.getHeight(),1f,1f,jellyEnemy.getRotation());
 			}
-			else{
-
+			if(enemy instanceof CactusEnemy){
+				CactusEnemy cactusEnemy = (CactusEnemy) enemy;
+				sb.draw(cactusFrame, cactusEnemy.getX() * Material.SIZE, cactusEnemy.getY() * Material.SIZE, cactusEnemy.getWidth()/2, cactusEnemy.getHeight()/2, cactusEnemy.getWidth(), cactusEnemy.getHeight(),1f,1f,cactusEnemy.getRotation());
 			}
 		}
 

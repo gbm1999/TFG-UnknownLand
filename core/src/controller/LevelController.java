@@ -101,7 +101,12 @@ public class LevelController implements InputProcessor {
 		movePlayer (player,delta);
 		for (Enemy entity : creatures) {
 			updateEntity(entity, delta, -9.8f);
+			if (entity instanceof JellyEnemy) {
+				moveAndUpdateMovingEnemy((JellyEnemy)entity,delta);
+			} else if(entity instanceof CactusEnemy) {
+			}
 		}
+		checkCollisionDamage();
 
 		// simply updates timer
 		level.update(delta);
@@ -132,13 +137,13 @@ public class LevelController implements InputProcessor {
 		updateEntity(player,deltaTime,-9.8f);//Apply gravity
 
 		if (keys.get(Keys.LEFT))
-			moveEntity(player,-player.SPEED * deltaTime , false);
+			movePlayer(player,-player.SPEED * deltaTime , false);
 
 		if (keys.get(Keys.RIGHT))
-			moveEntity(player,0.6f + player.SPEED * deltaTime , true);
+			movePlayer(player,0.6f + player.SPEED * deltaTime , true);
 	}
 
-	protected void moveEntity (RectangleCollider rectangleCollider,float amount, boolean type) {
+	protected void movePlayer (RectangleCollider rectangleCollider,float amount, boolean type) {
 		float newX = rectangleCollider.getX() + amount;
 		float val = 0;
 		if (type){
@@ -147,6 +152,43 @@ public class LevelController implements InputProcessor {
 		if (!level.doesRectCollideWithMap(newX, rectangleCollider.getY(), (int)rectangleCollider.getWidth(), (int)rectangleCollider.getHeight()))
 
 			rectangleCollider.setX(newX + val);
+	}
+
+	private void moveAndUpdateMovingEnemy(MovingEnemy moveEnemy, float delta) {
+		float newX;
+		float newY = moveEnemy.getY();
+
+
+		if(	moveEnemy.isMovingRight()){
+			newX = moveEnemy.getX() + player.SPEED * delta;
+		}
+		else {
+			newX = moveEnemy.getX() - player.SPEED * delta;
+		}
+		if (moveEnemy.isMovingRight() && level.doesRectCollideWithMap(newX + 0.6f, newY, (int)moveEnemy.getWidth(), (int)moveEnemy.getHeight())) {
+			moveEnemy.changeMoveDirection();
+		}
+		if (!moveEnemy.isMovingRight() && level.doesRectCollideWithMap(newX, newY, (int)moveEnemy.getWidth(), (int)moveEnemy.getHeight())) {
+			moveEnemy.changeMoveDirection();
+		}
+		if (moveEnemy.isMovingRight() && !level.doesRectCollideWithMap(newX + 0.7f, newY - 1, (int)moveEnemy.getWidth(), (int)moveEnemy.getHeight())) {
+			moveEnemy.changeMoveDirection();
+		}
+		if (!moveEnemy.isMovingRight() && !level.doesRectCollideWithMap(newX - 0.2f, newY - 1, (int)moveEnemy.getWidth(), (int)moveEnemy.getHeight())) {
+			moveEnemy.changeMoveDirection();
+		}
+		moveEnemy.setX(newX);
+	}
+
+	private void checkCollisionDamage() {
+		ArrayList<Enemy> enemies = level.getEnemyList();
+		for (Enemy enemy : enemies) {
+			if (player.collidesWith(enemy)) {
+				player.setHEALTH(player.getHEALTH() - 1);
+				coinSound.play();
+			}
+		}
+
 	}
 /*
 	private void moveAndUpdateEnemies(float delta) {

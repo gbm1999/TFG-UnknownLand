@@ -105,8 +105,11 @@ public class World  implements Serializable {
             }
             if (rng.nextDouble() < 0.2) // generamos Monster (75%) o Animal (25%) de las veces
                 creatures.add(new JellyEnemy(x, getMaxLocationAtX(x), 1 ));
-            else
+            else if (rng.nextDouble() > 0.7)
                 creatures.add(new CactusEnemy(x, getMaxLocationAtX(x), 1 , 1, 1));
+            else{
+
+            }
 
         }
 

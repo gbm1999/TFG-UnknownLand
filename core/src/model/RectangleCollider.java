@@ -45,24 +45,10 @@ public class RectangleCollider {
 	}
 	
 	public boolean collidesWith(RectangleCollider rectangleCollider2){
-		
-		float left1 = this.getX();
-		float right1 = this.getX() + this.getWidth();
-		float left2 = rectangleCollider2.getX();
-		float right2 = rectangleCollider2.getX() + rectangleCollider2.getWidth();
-		
-		float bottom1 = this.getY();
-		float top1 = this.getY() + this.getHeight();
-		float bottom2 = rectangleCollider2.getY();
-		float top2 = rectangleCollider2.getY() + rectangleCollider2.getHeight();
-		
-		if (bottom1 > top2) return false;
-		if (top1 < bottom2) return false;
-
-		if (right1 < left2) return false;
-		if (left1 > right2) return false;
-
-		return true;		
+		if(Math.abs(this.getX() - rectangleCollider2.getX()) < 0.2 && Math.abs(this.getY() - rectangleCollider2.getY()) < 0.2){
+			return true;
+		}
+		return false;
 	}
 
 	public float getRotation() {
