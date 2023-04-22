@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
@@ -13,10 +14,12 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.List;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
@@ -38,10 +41,12 @@ public class GameScreen extends AbstractScreen {
     private Table tableUITop;
     private Table tableUIBottom;
     private Table tablePause;
+    private Table tableInventory;
     private Table tableSummary;
     private Label timeAvailableLabel;
     private Label scoreLabel;
     private boolean pause = false;
+    private boolean inventory = false;
     private Label hiScoreLabel;
     private Label summaryScoreLabel;
     Music mp3Music;
@@ -67,15 +72,18 @@ public class GameScreen extends AbstractScreen {
         tableUITop = createUITopTable();
         tableUIBottom = createUIBottomTable();
         tablePause = createPauseTable();
+        tableInventory = createInventoryTable();
         tableSummary = createSummaryTable();
 
         this.setTableVisibility(tableSummary,false);
         this.setTableVisibility(tablePause,pause);
+        this.setTableVisibility(tableInventory,inventory);
 
         // add the table to the stage
         stage.addActor( tableUITop );
         stage.addActor( tablePause );
         stage.addActor( tableSummary );
+        stage.addActor(tableInventory);
 
         // Only add the touch buttons when running on Android
         if (Gdx.app.getType().equals(Application.ApplicationType.Android))
@@ -157,8 +165,17 @@ public class GameScreen extends AbstractScreen {
             };
         } );
 
+        Drawable imageInventory = new TextureRegionDrawable(new TextureRegion(new Texture("images/inventory.png")));
+        ImageButton inventoryButton = new ImageButton( imageInventory );
+        inventoryButton.addListener( new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                toggleInventory();
+            };
+        } );
 
         resultTable.add(timeAvailableLabel).width(400).left();
+        resultTable.add(inventoryButton).expandX().left();
         resultTable.add(scoreLabel).expandX().center();
         resultTable.add(pauseButton).expandX().right();
 
@@ -306,6 +323,90 @@ public class GameScreen extends AbstractScreen {
         return resultTableRoot;
     }
 
+
+    private Table createInventoryTable() {
+        // retrieve the skin (created on the AbstractScreen class)
+        Skin skin = super.getSkin();
+        Table table= new Table();
+        table.defaults().pad(10F);
+        table.setFillParent(true);
+
+        Label label=new Label("Inventory",skin);
+        label.setAlignment(Align.center);
+
+        table.add(label).colspan(2).fillX();
+
+        FileHandle skinFile = Gdx.files.internal("skin/ui/uiskin.json");
+        final Skin skin2 = new Skin(skinFile);
+        skin.getFont("default-font");
+
+        final List<String> inventory = new List<>(skin2), sell = new List<>(skin2);
+        inventory.setItems("Axe", "Fuel", "Helmet", "Flux Capacitor", "Shoes", "Hammer", "Trash Can", "The Hitchhiker's Guide To The Galaxy", "Cucumber");
+
+        table.setFillParent(true);
+        stage.addActor(table);
+
+        Table first_table=new Table(skin);
+        Label label2 = (new Label("ITEMS",skin));
+        label2.setColor(Color.RED);
+        first_table.add(label2);
+        first_table.row();
+        first_table.setBackground("grey_panel");
+        first_table.add(inventory).expand().fill();
+
+        Table second_table= new Table(skin);
+        label2 = (new Label("EQUIPMENT",skin));
+        label2.setColor(Color.RED);
+        second_table.add(label2);
+        second_table.row();
+        second_table.setBackground("grey_panel");
+        second_table.add(sell).expand().fill();
+
+        table.pad(100);
+        table.defaults().height(60);
+        table.defaults().width(350);
+        table.defaults().center();
+        table.row();
+        table.add(first_table).expand().right().width(350).height(350);
+        table.add(second_table).expand().left().width(350).height(350);;
+
+
+        DragAndDrop dnd = new DragAndDrop();
+        dnd.addSource(new DragAndDrop.Source(inventory) {
+            final DragAndDrop.Payload payload = new DragAndDrop.Payload();
+
+            @Override
+            public DragAndDrop.Payload dragStart(InputEvent event, float x, float y, int pointer) {
+                String item = inventory.getSelected();
+                payload.setObject(item);
+                inventory.getItems().removeIndex(inventory.getSelectedIndex());
+                payload.setDragActor(new Label(item, skin2));
+                payload.setInvalidDragActor(new Label(item + " (\"No equip!\")", skin2));
+                payload.setValidDragActor(new Label(item + " (\"Equip!\")", skin2));
+                return payload;
+            }
+
+            @Override
+            public void dragStop(InputEvent event, float x, float y, int pointer, DragAndDrop.Payload payload, DragAndDrop.Target target) {
+                if (target == null)
+                    inventory.getItems().add((String) payload.getObject());
+            }
+        });
+        dnd.addTarget(new DragAndDrop.Target(sell) {
+            @Override
+            public boolean drag(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
+                return !"Cucumber".equals(payload.getObject());
+            }
+
+            @Override
+            public void drop(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
+                sell.getItems().add((String) payload.getObject());
+            }
+        });
+        return table;
+
+    }
+
     private Table createSummaryTable() {
         // retrieve the skin (created on the AbstractScreen class)
         Skin skin = super.getSkin();
@@ -388,6 +489,11 @@ public class GameScreen extends AbstractScreen {
 
     }
 
+    protected void toggleInventory() {
+        this.inventory = !this.inventory ;
+        setTableVisibility(tableInventory, inventory);
+
+    }
     @Override
     public void resize(int width, int height) {
         super.resize(width, height);

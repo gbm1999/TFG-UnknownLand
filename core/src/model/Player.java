@@ -14,7 +14,8 @@ public class Player extends RectangleCollider{
 	public static final int SPEED = 5;
 	public static final int JUMP_VELOCITY = 2;
 	public static int HEALTH = 20;
-	
+	private Inventory inventory;
+
 	public enum State {
 		IDLE, WALKING, JUMPING, DYING, FALLING, WINNING
 	}		
@@ -31,6 +32,7 @@ public class Player extends RectangleCollider{
 		super(x, y, 32, 14);
 		position = new Vector2();
 		bulletList = new ArrayList<>();
+		inventory = new Inventory();
 	}
 	
 	public Vector2 getVelocity() {
@@ -99,4 +101,13 @@ public class Player extends RectangleCollider{
 		Player.HEALTH = HEALTH;
 	}
 
+	public Inventory getInventory() {
+		return inventory;
+	}
+
+	public void setInventory(Inventory inventory) {
+		this.inventory = inventory;
+	}
+
 }
+

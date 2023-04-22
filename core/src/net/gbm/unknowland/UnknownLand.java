@@ -13,6 +13,7 @@ import model.Material;
 import model.World;
 import screens.AbstractScreen;
 import screens.CreditsScreen;
+import screens.DragAndDropInventory;
 import screens.GameScreen;
 import screens.JoinHostGameScreen;
 import screens.MainMenuScreen;
