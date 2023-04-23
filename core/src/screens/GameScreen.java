@@ -393,7 +393,9 @@ public class GameScreen extends AbstractScreen {
 
                 sell.getItems().clear();
                 sell.getItems().add(item);
-                //tableInventory = createInventoryTable();
+                //update
+                tableInventory.remove();
+                tableInventory = createInventoryTable();
             }
         });
 
@@ -410,6 +412,7 @@ public class GameScreen extends AbstractScreen {
 
         table.add(first_table).expand().right().width(350).height(350);
         table.add(second_table).expand().left().width(350).height(350);;
+
         return table;
 
     }
@@ -497,7 +500,9 @@ public class GameScreen extends AbstractScreen {
     }
 
     protected void toggleInventory() {
+        tableInventory.remove();
         this.inventoryBoolean = !this.inventoryBoolean ;
+        tableInventory = createInventoryTable();
         setTableVisibility(tableInventory, inventoryBoolean);
 
     }
@@ -519,7 +524,6 @@ public class GameScreen extends AbstractScreen {
         summaryScoreLabel.setText("Score: "+10);
         hiScoreLabel.setText("Hi-Score: "+10);
     }
-
 
     private String getRandomMusic(){
         String[] musics = {"music/8bit_loop.mp3","music/chipChippy_loop.mp3","music/chippyCloudKid_loop.mp3",

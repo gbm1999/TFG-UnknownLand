@@ -2,7 +2,10 @@ package view;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -11,6 +14,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 import model.Bullet;
 import model.CactusEnemy;
@@ -18,6 +22,7 @@ import model.Enemy;
 import model.FirstBoss;
 import model.FlyEnemy;
 import model.Item;
+import model.ItemStack;
 import model.JellyEnemy;
 import model.Level;
 import model.Material;
@@ -25,6 +30,7 @@ import model.Player;
 import model.Player.State;
 import model.RectangleCollider;
 import model.SnailEnemy;
+import model.World;
 
 public class LevelRenderer {
 
@@ -33,6 +39,7 @@ public class LevelRenderer {
 	static Sprite playerIdleLeft;
 	static Sprite playerJumpLeft;
 	static Sprite playerJumpRight;
+	private Texture texture;
 
 	private TextureRegion jellyFrame;
 	private TextureRegion cactusFrame;
@@ -92,7 +99,10 @@ public class LevelRenderer {
 		cactusFrame = new TextureRegion();
 		cactusFrame = atlas3.findRegion("New Piskel-1.png");
 
-
+		Pixmap pixmap = new Pixmap(20, 2, Pixmap.Format.RGBA8888);
+		pixmap.setColor(Color.YELLOW);
+		pixmap.fillCircle(0, -2, 2);
+		texture = new Texture(pixmap);
 
 		camera = new OrthographicCamera();
 
@@ -109,7 +119,7 @@ public class LevelRenderer {
 
 	}
 
-	public void render(Player player,ArrayList<Enemy> enemies, SpriteBatch sb) {
+	public void render(Player player, ArrayList<Enemy> enemies, Map<World.Coord, ItemStack> items, SpriteBatch sb) {
 
 		float targetXPosition, targetYPosition;
 
@@ -134,6 +144,7 @@ public class LevelRenderer {
 
 		drawPlayer(player, sb);
 		drawEnemies(sb, enemies);
+		drawItems(sb, items);
 
 	}
 	public static void dispose() {
@@ -175,6 +186,12 @@ public class LevelRenderer {
 			}
 		}
 
+	}
+
+	private void drawItems(SpriteBatch sb, Map<World.Coord, ItemStack> itemList) {
+		for (Map.Entry<World.Coord, ItemStack> entry : itemList.entrySet()) {
+			sb.draw(texture, entry.getKey().getX() * Material.SIZE, entry.getKey().getY() * Material.SIZE);
+		}
 	}
 
 	private void animationDeath(RectangleCollider dyingEntity) {

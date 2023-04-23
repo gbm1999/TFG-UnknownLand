@@ -4,18 +4,17 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.Json.Serializable;
 import com.badlogic.gdx.utils.JsonValue;
 
 import org.bukkit.util.noise.CombinedNoiseGenerator;
 import org.bukkit.util.noise.OctaveGenerator;
 import org.bukkit.util.noise.PerlinOctaveGenerator;
-
-import com.badlogic.gdx.utils.Json.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
-
 import persistence.WorldMapProvider;
 import view.LevelRenderer;
 
@@ -27,6 +26,7 @@ public class World  implements Serializable {
     LevelRenderer lv;
     private TextureRegion[][] tiles;
     private ArrayList<Enemy> creatures;
+    private Map<Coord, ItemStack> items;
     private int width;
     private int height;
     private float timeElapsed = 0;
@@ -46,6 +46,7 @@ public class World  implements Serializable {
         height = SIZE;
         this.id = id;
         map = new int[5][SIZE][SIZE * 8];
+        items = new HashMap<Coord, ItemStack>();
 
         WorldMapProvider worldMapProvider = new WorldMapProvider();
         worldMapProvider= worldMapProvider.loadMap(id, SIZE, this);
@@ -107,8 +108,12 @@ public class World  implements Serializable {
                 creatures.add(new JellyEnemy(x, getMaxLocationAtX(x), 1 ));
             else if (rng.nextDouble() > 0.7)
                 creatures.add(new CactusEnemy(x, getMaxLocationAtX(x), 1 , 1, 1));
-            else{
-
+            else if (rng.nextDouble() > 0.8){
+                try {
+                    items.put(new Coord(x, getMaxLocationAtX(x)), new ItemStack(Material.EGG, new Random().nextInt(10)));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
 
         }
@@ -260,7 +265,7 @@ public class World  implements Serializable {
                 }
             }
         }
-        lv.render(player,creatures, batch);
+        lv.render(player,creatures,items,  batch);
         batch.end();
 
     }
@@ -417,5 +422,31 @@ public class World  implements Serializable {
         tiles = json.readValue("tiles", TextureRegion[][].class, jsonData);
         width = json.readValue("width", int.class, jsonData);
         width = json.readValue("width", int.class, jsonData);
+    }
+
+    public static class Coord {
+        private float x;
+        private float y;
+
+        Coord(float x, float y){
+            this.x = x;
+            this.y = y;
+        }
+
+        public float getX() {
+            return x;
+        }
+
+        public void setX(float x) {
+            this.x = x;
+        }
+
+        public float getY() {
+            return y;
+        }
+
+        public void setY(float y) {
+            this.y = y;
+        }
     }
 }
