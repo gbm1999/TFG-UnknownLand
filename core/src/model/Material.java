@@ -21,7 +21,16 @@ public enum Material {
     CACTUS(22, true, "Cactus", 0),
     FLY(23, true, "Fly", 0),
     SNAIL(24, true, "Snail", 0),
-    FIRST_BOSS(25, true, "First_boss", 0);
+    FIRST_BOSS(25, true, "First_boss", 0),
+    PISTOL(26, true, "PISTOL", 0),
+    DOUBLE_PISTOL(27, true, "DOUBLE_PISTOL", 0),
+    MK14(28, true, "MK14", 0),
+    PICKAXE(29, true, "PICKAXE", 0),
+    IRON_ARMOR(30, true, "IRON_ARMOR", 0),
+    EGG(31, true, "EGG", 0),
+    SEED(32, true, "SEED", 0),
+    STINGER_MEAT(33, true, "STINGER_MEAT", 0);
+    ;
 
     public static final int SIZE = 16;
 
@@ -57,8 +66,12 @@ public enum Material {
         return (this.id <= 5);
     }
 
+    public boolean isLiquid(){
+        return (this.id <= 5);
+    }
+
     public boolean isWeapon(){
-        return (this.id > 5 && this.id <= 8);
+        return (this.id > 25 && this.id <= 29);
     }
 
     public boolean isArmor(){
@@ -66,7 +79,7 @@ public enum Material {
     }
 
     public boolean isEdible(){
-        return (this.id > 13 && this.id <= 18);
+        return (this.id > 30 && this.id <= 33);
     }
     public boolean isTool(){
         return (this.id > 18 && this.id <= 20);

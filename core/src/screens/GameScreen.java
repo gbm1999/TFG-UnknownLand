@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.List;
@@ -23,6 +24,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Array;
 
 import controller.LevelController;
 import model.Material;
@@ -46,10 +48,14 @@ public class GameScreen extends AbstractScreen {
     private Label timeAvailableLabel;
     private Label scoreLabel;
     private boolean pause = false;
-    private boolean inventory = false;
+    private boolean inventoryBoolean = false;
     private Label hiScoreLabel;
     private Label summaryScoreLabel;
     Music mp3Music;
+
+    List<String> inventory;
+    List<String> sell;
+
     private ClickListener exitClickListener = new ClickListener() {
         @Override
         public void clicked(InputEvent event, float x, float y) {
@@ -62,6 +68,13 @@ public class GameScreen extends AbstractScreen {
 
     public GameScreen(UnknownLand unknownLand) {
         super(unknownLand);
+        Skin skin = super.getSkin();
+        skin.getFont("default-font");
+        FileHandle skinFile = Gdx.files.internal("skin/ui/uiskin.json");
+        final Skin skin2 = new Skin(skinFile);
+        inventory = new List<>(skin2);
+        sell = new List<>(skin2);
+
         show();
     }
     @Override
@@ -77,7 +90,7 @@ public class GameScreen extends AbstractScreen {
 
         this.setTableVisibility(tableSummary,false);
         this.setTableVisibility(tablePause,pause);
-        this.setTableVisibility(tableInventory,inventory);
+        this.setTableVisibility(tableInventory,inventoryBoolean);
 
         // add the table to the stage
         stage.addActor( tableUITop );
@@ -105,6 +118,7 @@ public class GameScreen extends AbstractScreen {
         mp3Music.setLooping(true);
         mp3Music.play();
         pause = false;
+
     }
     @Override
     public void render(float delta) {
@@ -302,7 +316,7 @@ public class GameScreen extends AbstractScreen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 togglePause();
-            };
+            }
         } );
 
         // button Exit
@@ -336,12 +350,12 @@ public class GameScreen extends AbstractScreen {
 
         table.add(label).colspan(2).fillX();
 
-        FileHandle skinFile = Gdx.files.internal("skin/ui/uiskin.json");
-        final Skin skin2 = new Skin(skinFile);
-        skin.getFont("default-font");
+        Array<String> Items= new Array<>();
 
-        final List<String> inventory = new List<>(skin2), sell = new List<>(skin2);
-        inventory.setItems("Axe", "Fuel", "Helmet", "Flux Capacitor", "Shoes", "Hammer", "Trash Can", "The Hitchhiker's Guide To The Galaxy", "Cucumber");
+        for(int i = 0; i < unknownLand.getWorld().getPlayer().getInventory().getSize(); i++){
+            Items.add(unknownLand.getWorld().getPlayer().getInventory().getItem(i).getType().getSymbol() +" ("+ unknownLand.getWorld().getPlayer().getInventory().getItem(i).getAmount() +")");
+        }
+        inventory.setItems(Items);
 
         table.setFillParent(true);
         stage.addActor(table);
@@ -352,6 +366,7 @@ public class GameScreen extends AbstractScreen {
         first_table.add(label2);
         first_table.row();
         first_table.setBackground("grey_panel");
+        first_table.setColor(Color.TEAL);
         first_table.add(inventory).expand().fill();
 
         Table second_table= new Table(skin);
@@ -360,6 +375,7 @@ public class GameScreen extends AbstractScreen {
         second_table.add(label2);
         second_table.row();
         second_table.setBackground("grey_panel");
+        second_table.setColor(Color.TEAL);
         second_table.add(sell).expand().fill();
 
         table.pad(100);
@@ -367,42 +383,33 @@ public class GameScreen extends AbstractScreen {
         table.defaults().width(350);
         table.defaults().center();
         table.row();
+
+
+        inventory.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                String item = inventory.getSelected();
+                //inventory.getItems().removeIndex(inventory.getSelectedIndex());
+
+                sell.getItems().clear();
+                sell.getItems().add(item);
+                //tableInventory = createInventoryTable();
+            }
+        });
+
+        if(sell.getItems().size != 0){
+            TextButton UseButton = new TextButton("use", skin);
+            UseButton.addListener( new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    System.out.println(sell.getItems().get(0));
+                }
+            } );
+            second_table.add(UseButton);
+        }
+
         table.add(first_table).expand().right().width(350).height(350);
         table.add(second_table).expand().left().width(350).height(350);;
-
-
-        DragAndDrop dnd = new DragAndDrop();
-        dnd.addSource(new DragAndDrop.Source(inventory) {
-            final DragAndDrop.Payload payload = new DragAndDrop.Payload();
-
-            @Override
-            public DragAndDrop.Payload dragStart(InputEvent event, float x, float y, int pointer) {
-                String item = inventory.getSelected();
-                payload.setObject(item);
-                inventory.getItems().removeIndex(inventory.getSelectedIndex());
-                payload.setDragActor(new Label(item, skin2));
-                payload.setInvalidDragActor(new Label(item + " (\"No equip!\")", skin2));
-                payload.setValidDragActor(new Label(item + " (\"Equip!\")", skin2));
-                return payload;
-            }
-
-            @Override
-            public void dragStop(InputEvent event, float x, float y, int pointer, DragAndDrop.Payload payload, DragAndDrop.Target target) {
-                if (target == null)
-                    inventory.getItems().add((String) payload.getObject());
-            }
-        });
-        dnd.addTarget(new DragAndDrop.Target(sell) {
-            @Override
-            public boolean drag(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-                return !"Cucumber".equals(payload.getObject());
-            }
-
-            @Override
-            public void drop(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-                sell.getItems().add((String) payload.getObject());
-            }
-        });
         return table;
 
     }
@@ -490,8 +497,8 @@ public class GameScreen extends AbstractScreen {
     }
 
     protected void toggleInventory() {
-        this.inventory = !this.inventory ;
-        setTableVisibility(tableInventory, inventory);
+        this.inventoryBoolean = !this.inventoryBoolean ;
+        setTableVisibility(tableInventory, inventoryBoolean);
 
     }
     @Override

@@ -1,9 +1,6 @@
 package model;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Body;
 
 import java.util.ArrayList;
 
@@ -33,6 +30,22 @@ public class Player extends RectangleCollider{
 		position = new Vector2();
 		bulletList = new ArrayList<>();
 		inventory = new Inventory();
+
+		ItemStack pistol = null;
+		try {
+			pistol = new ItemStack(Material.PISTOL,1);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		inventory.setItemInHand(pistol);
+		try {
+			inventory.addItem(pistol);
+			inventory.addItem(new ItemStack(Material.PICKAXE, 1));
+			inventory.addItem(new ItemStack(Material.EGG, 5));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public Vector2 getVelocity() {
