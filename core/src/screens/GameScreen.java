@@ -144,6 +144,11 @@ public class GameScreen extends AbstractScreen {
             Material material = this.unknownLand.getSelectedWorld().getMaterialByLocation(1, position.x, position.y);
             if (material != null){
                 System.out.println("Material: " + material.getId() + " " + material.getSymbol() +" " + position.x + " " + position.y);
+                try {
+                    this.unknownLand.getSelectedWorld().eraseBlock(position.x, position.y);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
             System.out.println(this.unknownLand.getSelectedWorld().getPlayer().getX() + " " + this.unknownLand.getSelectedWorld().getPlayer().getY());
         }
