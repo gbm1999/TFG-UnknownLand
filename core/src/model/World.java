@@ -307,6 +307,16 @@ public class World  implements Serializable {
 
         }
     }
+    public void putBlock(float x, float y) throws Exception {
+        int col = (int) (x / Material.SIZE);
+        int row = (int) (y / Material.SIZE);
+        if (col < 0 || col >= getWidth() || row < 0 || row > getHeight() || getHeight() - 1 - row < 0)
+            throw new Exception();
+        else {
+            map[1][getHeight() - 1 - row ][col] = 6;
+
+        }
+    }
     public int getWidth() {
         return map[0][0].length;
     }

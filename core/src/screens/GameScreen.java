@@ -153,6 +153,18 @@ public class GameScreen extends AbstractScreen {
             System.out.println(this.unknownLand.getSelectedWorld().getPlayer().getX() + " " + this.unknownLand.getSelectedWorld().getPlayer().getY());
         }
 
+        if (Gdx.input.isButtonPressed(Input.Buttons.RIGHT)) {
+            Vector3 position = this.unknownLand.getCamera().unproject(new Vector3(Gdx.input.getX() , Gdx.input.getY(), 0));
+            Material material = this.unknownLand.getSelectedWorld().getMaterialByLocation(1, position.x, position.y);
+            if (material != null){
+                System.out.println("Material: " + material.getId() + " " + material.getSymbol() +" " + position.x + " " + position.y);
+                try {
+                    this.unknownLand.getSelectedWorld().putBlock(position.x, position.y);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     private void setTableVisibility(Table targetTable, boolean visibility){
