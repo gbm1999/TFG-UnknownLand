@@ -15,6 +15,7 @@ import model.Enemy;
 import model.FirstBoss;
 import model.FlyEnemy;
 import model.Item;
+import model.ItemStack;
 import model.JellyEnemy;
 import model.Level;
 import model.MovingEnemy;
@@ -107,8 +108,11 @@ public class LevelController implements InputProcessor {
 			}
 		}
 		checkCollisionDamage();
+		checkCollisionItem();
+		moveAndCollideBullets(delta);
 
 		// simply updates timer
+		player.update(delta);
 		level.update(delta);
 	}
 	private void updateEntity(RectangleCollider rectangleCollider,float deltaTime, float gravity){
@@ -136,11 +140,47 @@ public class LevelController implements InputProcessor {
 
 		updateEntity(player,deltaTime,-9.8f);//Apply gravity
 
-		if (keys.get(Keys.LEFT))
+		if (keys.get(Keys.LEFT)){
 			movePlayer(player,-player.SPEED * deltaTime , false);
-
-		if (keys.get(Keys.RIGHT))
+			// left is pressed
+			player.setFacingLeft(true);
+			if (!player.getState().equals(State.JUMPING)
+					&& !player.getState().equals(State.FALLING)
+					&& !player.getState().equals(State.WALKING)) {
+				player.setState(State.WALKING);
+			}
+		}
+		if (keys.get(Keys.RIGHT)){
 			movePlayer(player,0.6f + player.SPEED * deltaTime , true);
+			player.setFacingLeft(false);
+			if (!player.getState().equals(State.JUMPING)
+					&& !player.getState().equals(State.FALLING)
+					&& !player.getState().equals(State.WALKING)) {
+				player.setState(State.WALKING);
+			}
+		} else {
+			if (!player.getState().equals(State.IDLE)) {
+				player.setState(State.IDLE);
+			}
+		}
+
+
+		// fire logic
+		if (keys.get(Keys.CONTROL_LEFT)
+				&& ((System.currentTimeMillis() - firePressedTime) > FIRE_TIMER)) {
+			firePressedTime = System.currentTimeMillis();
+			if (player.isFacingLeft()) {
+				player.getBulletList().add(
+						new Bullet(player.getX(), player.getY() + 0.2f,
+								1, 1,-Player.SPEED + 2,0f));
+			} else {
+				player.getBulletList().add(
+						new Bullet(player.getX(),
+								player.getY() + 0.2f,
+								1, 1,Player.SPEED + 2,0f));
+			}
+			fireSound.play();
+		}
 	}
 
 	protected void movePlayer (RectangleCollider rectangleCollider,float amount, boolean type) {
@@ -188,7 +228,53 @@ public class LevelController implements InputProcessor {
 				coinSound.play();
 			}
 		}
+	}
 
+	private void checkCollisionItem() {
+		Map<World.Coord, ItemStack> items = level.getItems();
+
+		for (Map.Entry<World.Coord, ItemStack>  entry : items.entrySet()) {
+			if(Math.abs(player.getX() - entry.getKey().getX()) < 0.2 && Math.abs(player.getY() - entry.getKey().getY()) < 0.2){
+				player.getInventory().addItem(entry.getValue());
+				level.getItems().remove(entry.getKey());
+			}
+		}
+	}
+
+
+	private void moveAndCollideBullets(float delta) {
+		Player player = level.getPlayer();
+		Iterator<Bullet> iter = player.getBulletList().iterator();
+		ArrayList<Enemy> enemies = level.getEnemyList();
+
+		while (iter.hasNext()) {
+			Bullet bullet = iter.next();
+			bullet.update(delta);
+			// move Bullet
+			bullet.setX(bullet.getX() + (bullet.getVelocity().x * delta));
+			boolean removeBullet = false;
+			// collide bullet with enemies
+			for (Enemy enemy : enemies) {
+				if (enemy.isAlive() && bullet.collidesWith(enemy)) {
+					if (enemy.reduceLife(player.getDamage())){
+						level.increaseScore(enemy.getPoints());
+						level.getEnemyList().remove(enemy);
+					}
+					removeBullet = true;
+					break;
+				}
+			}
+			if (removeBullet) {
+				iter.remove();
+				continue;
+			}
+			if (level.doesRectCollideWithMap(bullet.getX() + 0.6f, bullet.getY(), (int)bullet.getWidth(), (int)bullet.getHeight())) {
+				iter.remove();
+			}
+			// check if bullet life time is over
+			if (bullet.checkLifeTime())
+				iter.remove();
+		}
 	}
 /*
 	private void moveAndUpdateEnemies(float delta) {
@@ -441,82 +527,6 @@ public class LevelController implements InputProcessor {
 
 	}
 */
-	private void processInput() {
-		Player player = level.getPlayer();
-		float tileHeight = level.getHeight();
-		float tileWidth = level.getWidth();
-		// jumping logic
-		if (keys.get(Keys.SPACE)) {
-			if (player.canJump()) { // player can jump if is not jumping or
-									// falling or dying
-				jumpingPressed = true;
-				jumpPressedTime = System.currentTimeMillis();
-				player.setState(State.JUMPING);
-				player.getVelocity().y = JUMP_SPEED;
-				jumpSound.play();
-			} else {
-				if (jumpingPressed
-						&& ((System.currentTimeMillis() - jumpPressedTime) >= LONG_JUMP_PRESS)) {
-					jumpingPressed = false;
-				} else {
-					if (jumpingPressed) {
-						player.getVelocity().y = JUMP_SPEED;
-					}
-				}
-			}
-		} else {
-			jumpingPressed = false;
-		}
-
-		if (player.isAlive()) {
-			// movement logic
-			if (keys.get(Keys.LEFT)) {
-				// left is pressed
-				player.setFacingLeft(true);
-				if (!player.getState().equals(State.JUMPING)
-						&& !player.getState().equals(State.FALLING)
-						&& !player.getState().equals(State.WALKING)) {
-					player.setState(State.WALKING);
-				}
-				player.getAcceleration().x = -ACCELERATION;
-			} else if (keys.get(Keys.RIGHT)) {
-				// left is pressed
-				player.setFacingLeft(false);
-				if (!player.getState().equals(State.JUMPING)
-						&& !player.getState().equals(State.FALLING)
-						&& !player.getState().equals(State.WALKING)) {
-					player.setState(State.WALKING);
-				}
-				player.getAcceleration().x = ACCELERATION;
-			} else {
-				if (!player.getState().equals(State.JUMPING)
-						&& !player.getState().equals(State.FALLING)
-						&& !player.getState().equals(State.IDLE)) {
-					player.setState(State.IDLE);
-				}
-				player.getAcceleration().x = 0;
-			}
-
-			// fire logic
-			if (keys.get(Keys.CONTROL_LEFT)
-					&& ((System.currentTimeMillis() - firePressedTime) > FIRE_TIMER)) {
-				firePressedTime = System.currentTimeMillis();
-				if (player.isFacingLeft()) {
-					player.getBulletList().add(
-							new Bullet(player.getX(), player.getY()
-									+ (player.getHeight() / 3),
-									tileWidth, tileHeight,-Bullet.bullet_speed,0f));
-				} else {
-					player.getBulletList().add(
-							new Bullet(player.getX() + player.getWidth(),
-									player.getY() + (player.getHeight() / 3),
-									tileWidth, tileHeight,Bullet.bullet_speed,0f));
-				}
-				fireSound.play();
-			}
-		}
-	}
-
 
 	private void askForLevelToRestart() {
 		Gdx.app.log(getClass().getName(), "Asking for Level to Restart");

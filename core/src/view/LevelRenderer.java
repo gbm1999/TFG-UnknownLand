@@ -40,6 +40,7 @@ public class LevelRenderer {
 	static Sprite playerJumpLeft;
 	static Sprite playerJumpRight;
 	private Texture texture;
+	private Texture texture2;
 
 	private TextureRegion jellyFrame;
 	private TextureRegion cactusFrame;
@@ -75,13 +76,13 @@ public class LevelRenderer {
 
 		TextureRegion[] walkRightFrames = new TextureRegion[2];
 		TextureRegion[] walkLeftFrames = new TextureRegion[2];
-		int j = 1;
-		for (int i = 0; i < 2; i++) {
-			walkRightFrames[i] = atlas.findRegion("player" + j );
-			j = j + 2;
-			walkLeftFrames[i] = new TextureRegion(walkRightFrames[i]);
-			walkLeftFrames[i].flip(true, false);
-		}
+
+		walkRightFrames[0] = atlas.findRegion("player1");
+		walkRightFrames[1] = atlas.findRegion("player3");
+		walkLeftFrames[0] = new TextureRegion(walkRightFrames[0]);
+		walkLeftFrames[1] = new TextureRegion(walkRightFrames[1]);
+		walkLeftFrames[0].flip(true, false);
+		walkLeftFrames[1].flip(true, false);
 
 		walkLeftAnimation = new Animation(Player.WALK_FRAME_DURATION, walkLeftFrames);
 		walkRightAnimation = new Animation(Player.WALK_FRAME_DURATION, walkRightFrames);
@@ -103,6 +104,8 @@ public class LevelRenderer {
 		pixmap.setColor(Color.YELLOW);
 		pixmap.fillCircle(0, -2, 2);
 		texture = new Texture(pixmap);
+		pixmap.setColor(Color.RED);
+		texture2 = new Texture(pixmap);
 
 		camera = new OrthographicCamera();
 
@@ -145,6 +148,7 @@ public class LevelRenderer {
 		drawPlayer(player, sb);
 		drawEnemies(sb, enemies);
 		drawItems(sb, items);
+		drawBullets(sb, player);
 
 	}
 	public static void dispose() {
@@ -152,17 +156,17 @@ public class LevelRenderer {
 	}
 
 	public void drawPlayer(Player player, SpriteBatch sb) {
-		TextureRegion keyFrame = LevelRenderer.playerIdleRight;
+		TextureRegion keyFrame;
 
-		keyFrame = (TextureRegion) (player.isFacingLeft() ? walkLeftAnimation.getKeyFrame(player.getStateTime(), true) : walkRightAnimation.getKeyFrame(player.getStateTime(), true));
 		if(player.getState().equals(Player.State.WALKING)) {
 			keyFrame = (TextureRegion) (player.isFacingLeft() ? walkLeftAnimation.getKeyFrame(player.getStateTime(), true) : walkRightAnimation.getKeyFrame(player.getStateTime(), true));
 		} else if (player.getState().equals(State.JUMPING) || player.getState().equals(State.FALLING)) {
 				keyFrame = player.isFacingLeft() ? playerJumpLeft : playerJumpRight;
 		}
-
+		else{
+			keyFrame =  player.isFacingLeft() ? playerIdleLeft : playerIdleRight;
+		}
 			sb.draw(keyFrame, player.getX() * Material.SIZE, player.getY() * Material.SIZE);
-
 	}
 
 	private void drawEnemies(SpriteBatch sb, ArrayList<Enemy> enemyList) {
@@ -193,6 +197,13 @@ public class LevelRenderer {
 			sb.draw(texture, entry.getKey().getX() * Material.SIZE, entry.getKey().getY() * Material.SIZE);
 		}
 	}
+
+	private void drawBullets(SpriteBatch sb, Player player) {
+		for (Bullet bullet : player.getBulletList()){
+			sb.draw(texture2, bullet.getX()  * Material.SIZE, bullet.getY()  * Material.SIZE);
+		}
+	}
+
 
 	private void animationDeath(RectangleCollider dyingEntity) {
 		float oldWidth = dyingEntity.getWidth();

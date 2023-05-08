@@ -31,6 +31,18 @@ public class Inventory {
      * @return devuelve la cantidad del item
      */
     public int addItem(ItemStack itemss){
+        boolean flag = true;
+        for (ItemStack item : items) {
+            if(item.getType() == itemss.getType()){
+                try {
+                    item.setAmount(item.getAmount() + itemss.getAmount());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                flag = false;
+            }
+        }
+        if (flag)
         items.add(itemss);
         return itemss.getAmount();
     }

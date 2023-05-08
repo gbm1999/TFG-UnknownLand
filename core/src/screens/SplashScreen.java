@@ -32,7 +32,7 @@ public class SplashScreen extends AbstractScreen {
         Gdx.gl.glClear( GL20.GL_COLOR_BUFFER_BIT );        
 
         // load the splash image and create the texture region
-        splashTexture = new Texture( Gdx.files.internal("supermegabuzz.png" ));
+        splashTexture = new Texture( Gdx.files.internal("unknownland.png" ));
 
         // we set the linear texture filter to improve the stretching
         splashTexture.setFilter( TextureFilter.Linear, TextureFilter.Linear );

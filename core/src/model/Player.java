@@ -7,7 +7,7 @@ import java.util.ArrayList;
 public class Player extends RectangleCollider{
 
 	private final static int BASE_DAMAGE = 1;
-	public static final float WALK_FRAME_DURATION = 0.05F;
+	public static final float WALK_FRAME_DURATION = 0.05f;
 	public static final int SPEED = 5;
 	public static final int JUMP_VELOCITY = 2;
 	public static int HEALTH = 20;
@@ -73,6 +73,10 @@ public class Player extends RectangleCollider{
 		this.state = state;
 	}
 
+	public void update(float delta) {
+		stateTime += delta;
+	}
+
 	public boolean isFacingLeft(){
 		return facingLeft;	
 	}
@@ -112,6 +116,12 @@ public class Player extends RectangleCollider{
 
 	public static void setHEALTH(int HEALTH) {
 		Player.HEALTH = HEALTH;
+		if(Player.HEALTH > 20) {
+			Player.HEALTH = 20;
+		}
+		if(Player.HEALTH < 0) {
+			Player.HEALTH = 0;
+		}
 	}
 
 	public Inventory getInventory() {

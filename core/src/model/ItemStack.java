@@ -7,7 +7,7 @@ public class ItemStack {
     /**
      * MAX_STACK_SIZE es el maximo valor de items por stack
      */
-    public static final int MAX_STACK_SIZE = 64;
+    public static final int MAX_STACK_SIZE = 1000;
     private Material type;
 
     /**

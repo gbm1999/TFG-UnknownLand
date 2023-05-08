@@ -45,7 +45,7 @@ public class RectangleCollider {
 	}
 	
 	public boolean collidesWith(RectangleCollider rectangleCollider2){
-		if(Math.abs(this.getX() - rectangleCollider2.getX()) < 0.2 && Math.abs(this.getY() - rectangleCollider2.getY()) < 0.2){
+		if(Math.abs(this.getX() - rectangleCollider2.getX()) < 0.4 && Math.abs(this.getY() - rectangleCollider2.getY()) < 0.4){
 			return true;
 		}
 		return false;

@@ -405,6 +405,28 @@ public class GameScreen extends AbstractScreen {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
                     System.out.println(sell.getItems().get(0));
+
+                    for(int i = 0; i < unknownLand.getWorld().getPlayer().getInventory().getSize(); i++){
+                        if(sell.getItems().get(0).contains(unknownLand.getWorld().getPlayer().getInventory().getItem(i).getType().getSymbol())){
+                            if(unknownLand.getWorld().getPlayer().getInventory().getItem(i).getType().isEdible()
+                             && unknownLand.getWorld().getPlayer().getInventory().getItem(i).getAmount() > 1)
+                            {
+                                try {
+                                    unknownLand.getWorld().getPlayer().getInventory().getItem(i).setAmount(unknownLand.getWorld().getPlayer().getInventory().getItem(i).getAmount() - 1);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                                unknownLand.getWorld().getPlayer().setHEALTH(unknownLand.getWorld().getPlayer().getHEALTH() + 5);
+
+                                sell.getItems().clear();
+                                sell.getItems().add(unknownLand.getWorld().getPlayer().getInventory().getItem(i).getType().getSymbol() +" ("+ unknownLand.getWorld().getPlayer().getInventory().getItem(i).getAmount() +")");
+                            }
+                        }
+                    }
+                    //update
+
+                    tableInventory.remove();
+                    tableInventory = createInventoryTable();
                 }
             } );
             second_table.add(UseButton);
@@ -519,10 +541,8 @@ public class GameScreen extends AbstractScreen {
         mp3Music = null;
     }
     private void updateLabels() {
-        timeAvailableLabel.setText("Time: "+10);
+        timeAvailableLabel.setText("Name: Steve");
         scoreLabel.setText("Live: " + this.unknownLand.getWorld().getPlayer().getHEALTH());
-        summaryScoreLabel.setText("Score: "+10);
-        hiScoreLabel.setText("Hi-Score: "+10);
     }
 
     private String getRandomMusic(){

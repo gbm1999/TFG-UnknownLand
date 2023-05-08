@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
+
 import persistence.WorldMapProvider;
 import view.LevelRenderer;
 
@@ -46,7 +48,7 @@ public class World  implements Serializable {
         height = SIZE;
         this.id = id;
         map = new int[5][SIZE][SIZE * 8];
-        items = new HashMap<Coord, ItemStack>();
+        items = new ConcurrentHashMap<>();;
 
         WorldMapProvider worldMapProvider = new WorldMapProvider();
         worldMapProvider= worldMapProvider.loadMap(id, SIZE, this);
@@ -399,6 +401,10 @@ public class World  implements Serializable {
 
     public ArrayList<Enemy> getEnemyList(){
         return creatures;
+    }
+
+    public Map<Coord, ItemStack> getItems() {
+        return items;
     }
 
 
