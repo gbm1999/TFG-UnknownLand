@@ -7,8 +7,8 @@ import java.util.List;
 
 public class CactusEnemy extends Enemy {
 	
-	private static final float ENEMY_SIZE_X = 18f;
-	private static final float ENEMY_SIZE_Y = 36f;
+	private static final float ENEMY_SIZE_X = 12f;
+	private static final float ENEMY_SIZE_Y = 18f;
 	private static final int LIFE = 2;
 	private static final float ACTION_RADIUS = 180f;
 	private static final float FIRE_RATE = 1f; //seconds
@@ -17,7 +17,7 @@ public class CactusEnemy extends Enemy {
 	private List<Bullet> bulletList;
 
 	public CactusEnemy(float x, float y,float tileWidth, float tileHeight, int points) {
-		super(x, y, ENEMY_SIZE_X, ENEMY_SIZE_Y, Enemy.CACTUS, points, CactusEnemy.LIFE);
+		super(x, y, ENEMY_SIZE_X * 1.5f, ENEMY_SIZE_Y, Enemy.CACTUS, points, CactusEnemy.LIFE);
 		bulletList = new ArrayList<Bullet>();
 	}
 	

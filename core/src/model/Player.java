@@ -26,7 +26,7 @@ public class Player extends RectangleCollider{
 	private ArrayList<Bullet> bulletList;
 	
 	public Player(float x, float y){
-		super(x, y, 32, 14);
+		super(x, y, 12, 17);
 		position = new Vector2();
 		bulletList = new ArrayList<>();
 		inventory = new Inventory();

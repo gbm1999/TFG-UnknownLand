@@ -45,10 +45,26 @@ public class RectangleCollider {
 	}
 	
 	public boolean collidesWith(RectangleCollider rectangleCollider2){
+		/**
 		if(Math.abs(this.getX() - rectangleCollider2.getX()) < 0.4 && Math.abs(this.getY() - rectangleCollider2.getY()) < 0.4){
 			return true;
 		}
 		return false;
+		 */
+
+		float bottom1 = this.getY();
+		float top1 = this.getY() + (0.1f *this.getHeight());
+		float bottom2 = rectangleCollider2.getY();
+		float top2 = rectangleCollider2.getY() + (0.1f *rectangleCollider2.getHeight());
+
+		if (bottom1 > top2) return false;
+		if (top1 < bottom2) return false;
+
+		if(Math.abs(this.getX() - rectangleCollider2.getX()) < 0.4)
+			return true;
+
+		return false;
+
 	}
 
 	public float getRotation() {
