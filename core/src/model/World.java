@@ -209,6 +209,7 @@ public class World  implements Serializable {
         for (int x = 0; x < grid.length; x++) {
             creatures.add(new JellyEnemy(x, getEmptyLocationAtX(x),  1));
         }
+        creatures.add(new FirstBoss(2, getMaxLocationAtX((int)player.getX()), 1 ));
         return this;
     }
     public int getMaxLocationAtX(int x){

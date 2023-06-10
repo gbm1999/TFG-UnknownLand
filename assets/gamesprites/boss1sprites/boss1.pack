@@ -1,0 +1,12 @@
+
+boss1.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+New Piskel-1.png
+  rotate: false
+  xy: 1, 1
+  size: 51, 43
+  orig: 60, 60
+  offset: 3, 6
+  index: -1

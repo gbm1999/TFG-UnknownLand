@@ -5,8 +5,9 @@ import com.badlogic.gdx.math.Vector2;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FirstBoss extends Enemy {
-	
+public class FirstBoss extends MovingEnemy {
+
+	private static final float ENEMY_SPEED = 25f;
 	private static final float JUMP_SPEED = 200f;
 	private Vector2 velocity = new Vector2();
 	private Vector2 acceleration = new Vector2();
@@ -71,7 +72,12 @@ public class FirstBoss extends Enemy {
 	public boolean isFacingLeft() {
 		return facingLeft;
 	}
-	
+
+	@Override
+	protected float speed()  {
+		return ENEMY_SPEED;
+	}
+
 	public Vector2 getVelocity() {
 		if (jumping && stillJumping())
 			velocity.y = JUMP_SPEED;

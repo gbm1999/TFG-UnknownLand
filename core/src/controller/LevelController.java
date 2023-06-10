@@ -54,6 +54,8 @@ public class LevelController implements InputProcessor {
 
 	// Acceleration applied to the player when moving left or right
 	private static final float ACCELERATION = 750f;
+	private float delay = 2.0f;
+	private float timer;
 
 	private static final long TIME_TO_RESTART_LEVEL = 1000l;
 	//private static final long TIME_TO_FINISH_LEVEL = (long) (LevelRenderer.ANIMATION_WIN_DURATION * 1500l);
@@ -105,6 +107,11 @@ public class LevelController implements InputProcessor {
 			if (entity instanceof JellyEnemy) {
 				moveAndUpdateMovingEnemy((JellyEnemy)entity,delta);
 			} else if(entity instanceof CactusEnemy) {
+				moveCactusEnemyBullets((CactusEnemy) entity, player, delta);
+			}
+			else if(entity instanceof FirstBoss){
+				moveAndUpdateBoss1((FirstBoss) entity, delta);
+				//moveFirstBossBullets((FirstBoss) moveEnemy, player, delta);
 			}
 		}
 		checkCollisionDamage();
@@ -195,37 +202,84 @@ public class LevelController implements InputProcessor {
 	}
 
 	private void moveAndUpdateMovingEnemy(MovingEnemy moveEnemy, float delta) {
-		float newX;
+		float newX = moveEnemy.getX();
 		float newY = moveEnemy.getY();
 
+		if(moveEnemy instanceof FirstBoss){
+			if(moveEnemy.getX() < player.getX()){
+				newX = moveEnemy.getX() + 2 * delta;
+				moveEnemy.setMovingRight(true);
+			}
+			else if (moveEnemy.getX() > player.getX()) {
+				newX = moveEnemy.getX() - 2 * delta;
+				moveEnemy.setMovingRight(false);
+			}
+			else{
 
-		if(	moveEnemy.isMovingRight()){
-			newX = moveEnemy.getX() + player.SPEED * delta;
+			}
+			if (moveEnemy.isMovingRight() && level.doesRectCollideWithMap(newX + 0.6f, newY, (int)moveEnemy.getWidth(), (int)moveEnemy.getHeight())) {
+				if ( moveEnemy.grounded)
+					moveEnemy.velocityY += moveEnemy.getWidth() ;
+				else
+					moveEnemy.velocityY += moveEnemy.getWidth() * delta;
+				newX = moveEnemy.getX();
+			}
+			if (!moveEnemy.isMovingRight() && level.doesRectCollideWithMap(newX, newY, (int)moveEnemy.getWidth(), (int)moveEnemy.getHeight())) {
+				if ( moveEnemy.grounded)
+					moveEnemy.velocityY += moveEnemy.getWidth() ;
+				else
+					moveEnemy.velocityY += moveEnemy.getWidth() * delta;
+				newX = moveEnemy.getX();
+			}
 		}
-		else {
-			newX = moveEnemy.getX() - player.SPEED * delta;
+		else{
+			if(	moveEnemy.isMovingRight()){
+				newX = moveEnemy.getX() + player.SPEED * delta;
+			}
+			else {
+				newX = moveEnemy.getX() - player.SPEED * delta;
+			}
+			if (moveEnemy.isMovingRight() && level.doesRectCollideWithMap(newX + 0.6f, newY, (int)moveEnemy.getWidth(), (int)moveEnemy.getHeight())) {
+				moveEnemy.changeMoveDirection();
+			}
+			if (!moveEnemy.isMovingRight() && level.doesRectCollideWithMap(newX, newY, (int)moveEnemy.getWidth(), (int)moveEnemy.getHeight())) {
+				moveEnemy.changeMoveDirection();
+			}
+			if (moveEnemy.isMovingRight() && !level.doesRectCollideWithMap(newX + 0.7f, newY - 1, (int)moveEnemy.getWidth(), (int)moveEnemy.getHeight())) {
+				moveEnemy.changeMoveDirection();
+			}
+			if (!moveEnemy.isMovingRight() && !level.doesRectCollideWithMap(newX - 0.2f, newY - 1, (int)moveEnemy.getWidth(), (int)moveEnemy.getHeight())) {
+				moveEnemy.changeMoveDirection();
+			}
 		}
-		if (moveEnemy.isMovingRight() && level.doesRectCollideWithMap(newX + 0.6f, newY, (int)moveEnemy.getWidth(), (int)moveEnemy.getHeight())) {
-			moveEnemy.changeMoveDirection();
-		}
-		if (!moveEnemy.isMovingRight() && level.doesRectCollideWithMap(newX, newY, (int)moveEnemy.getWidth(), (int)moveEnemy.getHeight())) {
-			moveEnemy.changeMoveDirection();
-		}
-		if (moveEnemy.isMovingRight() && !level.doesRectCollideWithMap(newX + 0.7f, newY - 1, (int)moveEnemy.getWidth(), (int)moveEnemy.getHeight())) {
-			moveEnemy.changeMoveDirection();
-		}
-		if (!moveEnemy.isMovingRight() && !level.doesRectCollideWithMap(newX - 0.2f, newY - 1, (int)moveEnemy.getWidth(), (int)moveEnemy.getHeight())) {
-			moveEnemy.changeMoveDirection();
-		}
+
 		moveEnemy.setX(newX);
 	}
 
+	private void moveAndUpdateBoss1(FirstBoss moveEnemy, float deltaTime) {
+
+		if (moveEnemy.distanceTo(this.player) < moveEnemy.getActionRadius()){
+			moveEnemy.shoot(this.player.getX()+ this.player.getWidth()/2, this.player.getY()+ this.player.getHeight()/2,this.level.getHeight(),this.level.getHeight());
+		}
+
+
+		//moveEnemy.moveTowardsPlayer(player);
+		//moveEnemy.setY(moveEnemy.getY() + velocity.y * delta);
+		updateEntity(moveEnemy,deltaTime,-0.03f);
+		moveAndUpdateMovingEnemy(moveEnemy,deltaTime);
+
+
+	}
+
 	private void checkCollisionDamage() {
+		float deltaTime = Gdx.graphics.getDeltaTime();
+		timer += deltaTime;
 		ArrayList<Enemy> enemies = level.getEnemyList();
 		for (Enemy enemy : enemies) {
-			if (player.collidesWith(enemy)) {
+			if (player.collidesWith(enemy) && timer >= delay) {
 				player.setHEALTH(player.getHEALTH() - 1);
 				coinSound.play();
+				timer = 0.0f;
 			}
 		}
 	}
@@ -276,6 +330,35 @@ public class LevelController implements InputProcessor {
 				iter.remove();
 		}
 	}
+
+	private void moveCactusEnemyBullets(CactusEnemy cactusEnemy, Player player, float delta){
+		//Move bullets
+
+		if (cactusEnemy.distanceTo(player) < cactusEnemy.getActionRadius()){
+			cactusEnemy.shoot(player.getX(), player.getY(),1,1);
+		}
+		Iterator<Bullet> iter = cactusEnemy.getBulletList().iterator();
+		while (iter.hasNext()) {
+			Bullet bullet = iter.next();
+			bullet.update(delta);
+			// move Bullet
+			bullet.setX(bullet.getX() + (bullet.getVelocity().x * delta));
+			bullet.setY(bullet.getY() + (bullet.getVelocity().y * delta));
+
+			if (bullet.collidesWith(player)) {
+				iter.remove();
+			}
+			// collide bullet with walls
+
+			if (level.doesRectCollideWithMap(bullet.getX() + 0.6f, bullet.getY(), (int)bullet.getWidth(), (int)bullet.getHeight())) {
+				//iter.remove();
+			}
+			// check if bullet life time is over
+			if (bullet.checkLifeTime())
+				iter.remove();
+		}
+	}
+
 /*
 	private void moveAndUpdateEnemies(float delta) {
 		Player player = level.getPlayer();

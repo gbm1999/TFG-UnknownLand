@@ -44,6 +44,7 @@ public class LevelRenderer {
 
 	private TextureRegion jellyFrame;
 	private TextureRegion cactusFrame;
+	private TextureRegion bossFrame;
 
 	private Animation walkLeftAnimation;
 	private Animation walkRightAnimation;
@@ -51,9 +52,13 @@ public class LevelRenderer {
 	private Animation jellyLeftAnimation;
 	private Animation jellyRightAnimation;
 
+	private TextureRegion bossFrameLeft;
+	private TextureRegion bossFrameRight;
+
 	static TextureAtlas atlas;
 	static TextureAtlas atlas2;
 	static TextureAtlas atlas3;
+	static TextureAtlas atlas4;
 	private OrthographicCamera camera;
 	private static final float LERP = 0.15f;
 	private float minCameraPositionX;
@@ -68,6 +73,7 @@ public class LevelRenderer {
 		atlas = new TextureAtlas(Gdx.files.internal("gamesprites/playersprites/Player.pack"));
 		atlas2 = new TextureAtlas(Gdx.files.internal("gamesprites/jellysprites/jelly.pack"));
 		atlas3 = new TextureAtlas(Gdx.files.internal("gamesprites/cactussprites/Cactus.pack"));
+		atlas4 = new TextureAtlas(Gdx.files.internal("gamesprites/boss1sprites/boss1.pack"));
 		jump = atlas.createSprite("player1");
 		playerIdleRight = atlas.createSprite("player2");
 		playerIdleLeft = atlas.createSprite("player5");
@@ -99,6 +105,10 @@ public class LevelRenderer {
 
 		cactusFrame = new TextureRegion();
 		cactusFrame = atlas3.findRegion("New Piskel-1.png");
+
+		bossFrameRight = atlas4.findRegion("New Piskel-1.png");
+		bossFrameLeft = new TextureRegion(bossFrameRight);
+		bossFrameLeft.flip(true, false);
 
 		Pixmap pixmap = new Pixmap(20, 2, Pixmap.Format.RGBA8888);
 		pixmap.setColor(Color.YELLOW);
@@ -187,6 +197,11 @@ public class LevelRenderer {
 			if(enemy instanceof CactusEnemy){
 				CactusEnemy cactusEnemy = (CactusEnemy) enemy;
 				sb.draw(cactusFrame, cactusEnemy.getX() * Material.SIZE, cactusEnemy.getY() * Material.SIZE, cactusEnemy.getWidth()/2, cactusEnemy.getHeight()/2, cactusEnemy.getWidth(), cactusEnemy.getHeight(),1f,1f,cactusEnemy.getRotation());
+			}
+			if(enemy instanceof FirstBoss){
+				FirstBoss firstBoss = (FirstBoss) enemy;
+				bossFrame = (TextureRegion) (firstBoss.isMovingRight()?bossFrameRight:bossFrameLeft);
+				sb.draw(bossFrame, firstBoss.getX() * Material.SIZE, firstBoss.getY() * Material.SIZE, firstBoss.getWidth()/2, firstBoss.getHeight()/2, firstBoss.getWidth(), firstBoss.getHeight(),1f,1f,firstBoss.getRotation());
 			}
 		}
 
