@@ -1,0 +1,19 @@
+
+fly.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+flyenemy1
+  rotate: false
+  xy: 1, 1
+  size: 20, 10
+  orig: 32, 32
+  offset: 7, 12
+  index: -1
+flyenemy2
+  rotate: false
+  xy: 23, 3
+  size: 16, 8
+  orig: 32, 32
+  offset: 10, 12
+  index: -1

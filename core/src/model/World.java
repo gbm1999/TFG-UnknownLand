@@ -11,8 +11,8 @@ import com.badlogic.gdx.utils.JsonValue;
 import org.bukkit.util.noise.CombinedNoiseGenerator;
 import org.bukkit.util.noise.OctaveGenerator;
 import org.bukkit.util.noise.PerlinOctaveGenerator;
+
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
@@ -29,12 +29,13 @@ public class World  implements Serializable {
     private TextureRegion[][] tiles;
     private ArrayList<Enemy> creatures;
     private Map<Coord, ItemStack> items;
+    private ArrayList<Task> tasks;
     private int width;
     private int height;
-    private float timeElapsed = 0;
+
     long range = 1234567L;
     Random r = new Random();
-
+    private float timeElapsed = 0;
     private final long seed = (long)(r.nextDouble()*range);
     private int score;
 
@@ -42,6 +43,7 @@ public class World  implements Serializable {
     {
         tiles = TextureRegion.split(new Texture("tiles.png"), Material.SIZE, Material.SIZE);
         creatures = new ArrayList<>();
+        tasks = new ArrayList<>();
         player = new Player(1000, 1000);
         lv = new LevelRenderer(player);
         width = SIZE * 8;
@@ -116,6 +118,9 @@ public class World  implements Serializable {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+            }
+            else if (rng.nextDouble() > 0.9){
+                creatures.add(new FlyEnemy(x, getMaxLocationAtX(x), 1 ));
             }
 
         }
@@ -210,6 +215,26 @@ public class World  implements Serializable {
             creatures.add(new JellyEnemy(x, getEmptyLocationAtX(x),  1));
         }
         creatures.add(new FirstBoss(2, getMaxLocationAtX((int)player.getX()), 1 ));
+
+        System.out.println ("Generando tareas de recursos");
+        for(int i = 0; i < 6; i++){
+            Task task = new Task("Tarea "+i);
+            task.setDescription(Material.getMaterialById(i+7).getSymbol());
+            tasks.add(task);
+        }
+
+        System.out.println ("Generando tareas de enemigos");
+        for(int i = 6; i < 11; i++){
+            Task task = new Task("Tarea "+i);
+            task.setDescription(5 * i+ " " + Material.getMaterialById(i+20).getSymbol());
+            try {
+                task.setItem(new ItemStack(Material.getMaterialById(i+20), 1));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            tasks.add(task);
+        }
+
         return this;
     }
     public int getMaxLocationAtX(int x){
@@ -257,8 +282,11 @@ public class World  implements Serializable {
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
 
+        int x = (int) player.x + 100;
+        x = (x < 0 ? 0 : x >=  getHeight() ? getHeight() : x);
+
         for (int layer = 0; layer < getLayers(); layer++) {
-            for (int row = 0; row < getHeight(); row++) {
+            for (int row = -x; row < x; row++) {
                 for (int col = 0; col < getWidth(); col++) {
                     Material type = this.getMaterialByCoordinate(layer, col, row);
                     if (type != null && !type.isEnemy() && type.getId() != 0)
@@ -285,6 +313,15 @@ public class World  implements Serializable {
 
     public String getId() {
         return id;
+    }
+
+    public boolean checkProgressPlayer(){
+        for(int i = 0; i < tasks.size(); i++){
+            if(!tasks.get(i).isCompleted()){
+                return false;
+            }
+        }
+        return true;
     }
 
     public Material getMaterialByCoordinate(int layer, int col, int row) {
@@ -427,6 +464,10 @@ public class World  implements Serializable {
 
     public Map<Coord, ItemStack> getItems() {
         return items;
+    }
+
+    public ArrayList<Task> getTasks() {
+        return tasks;
     }
 
 

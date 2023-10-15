@@ -1,7 +1,6 @@
 package view;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -11,7 +10,6 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -21,15 +19,12 @@ import model.CactusEnemy;
 import model.Enemy;
 import model.FirstBoss;
 import model.FlyEnemy;
-import model.Item;
 import model.ItemStack;
 import model.JellyEnemy;
-import model.Level;
 import model.Material;
 import model.Player;
 import model.Player.State;
 import model.RectangleCollider;
-import model.SnailEnemy;
 import model.World;
 
 public class LevelRenderer {
@@ -45,12 +40,16 @@ public class LevelRenderer {
 	private TextureRegion jellyFrame;
 	private TextureRegion cactusFrame;
 	private TextureRegion bossFrame;
+	private TextureRegion FlyEnemyFrame;
 
 	private Animation walkLeftAnimation;
 	private Animation walkRightAnimation;
 
 	private Animation jellyLeftAnimation;
 	private Animation jellyRightAnimation;
+
+	private Animation flyLeftAnimation;
+	private Animation flyRightAnimation;
 
 	private TextureRegion bossFrameLeft;
 	private TextureRegion bossFrameRight;
@@ -59,6 +58,7 @@ public class LevelRenderer {
 	static TextureAtlas atlas2;
 	static TextureAtlas atlas3;
 	static TextureAtlas atlas4;
+	static TextureAtlas atlas5;
 	private OrthographicCamera camera;
 	private static final float LERP = 0.15f;
 	private float minCameraPositionX;
@@ -74,6 +74,7 @@ public class LevelRenderer {
 		atlas2 = new TextureAtlas(Gdx.files.internal("gamesprites/jellysprites/jelly.pack"));
 		atlas3 = new TextureAtlas(Gdx.files.internal("gamesprites/cactussprites/Cactus.pack"));
 		atlas4 = new TextureAtlas(Gdx.files.internal("gamesprites/boss1sprites/boss1.pack"));
+		atlas5 = new TextureAtlas(Gdx.files.internal("gamesprites/flysprites/fly.pack"));
 		jump = atlas.createSprite("player1");
 		playerIdleRight = atlas.createSprite("player2");
 		playerIdleLeft = atlas.createSprite("player5");
@@ -109,6 +110,17 @@ public class LevelRenderer {
 		bossFrameRight = atlas4.findRegion("New Piskel-1.png");
 		bossFrameLeft = new TextureRegion(bossFrameRight);
 		bossFrameLeft.flip(true, false);
+
+		TextureRegion[] flyRightFrames = new TextureRegion[2];
+		TextureRegion[] flyLeftFrames = new TextureRegion[2];
+		for (int i = 0; i < 2; i++) {
+			flyLeftFrames[i] = atlas5.findRegion("flyenemy" + (i+1) );
+			flyRightFrames[i] = new TextureRegion(flyLeftFrames[i]);
+			flyRightFrames[i].flip(true, false);
+		}
+		flyLeftAnimation = new Animation(0.30f, flyLeftFrames);
+		flyRightAnimation = new Animation(0.30f, flyRightFrames);
+
 
 		Pixmap pixmap = new Pixmap(20, 2, Pixmap.Format.RGBA8888);
 		pixmap.setColor(Color.YELLOW);
@@ -192,16 +204,24 @@ public class LevelRenderer {
 			if(enemy instanceof JellyEnemy){
 				JellyEnemy jellyEnemy = (JellyEnemy) enemy;
 				jellyFrame = (TextureRegion) (jellyEnemy.isMovingRight()?jellyLeftAnimation.getKeyFrame(jellyEnemy.getStateTime(),true):jellyRightAnimation.getKeyFrame(jellyEnemy.getStateTime(),true));
-				sb.draw(jellyFrame, jellyEnemy.getX() * Material.SIZE, jellyEnemy.getY() * Material.SIZE, jellyEnemy.getWidth()/2, jellyEnemy.getHeight()/2, jellyEnemy.getWidth(), jellyEnemy.getHeight(),1f,1f,jellyEnemy.getRotation());
+				sb.draw(jellyFrame, jellyEnemy.getX() * Material.SIZE, jellyEnemy.getY() * Material.SIZE);
+			}
+			if(enemy instanceof FlyEnemy){
+				FlyEnemy flyEnemy = (FlyEnemy) enemy;
+				FlyEnemyFrame = (TextureRegion) (flyEnemy.isMovingRight()?flyLeftAnimation.getKeyFrame(flyEnemy.getStateTime(),true):flyRightAnimation.getKeyFrame(flyEnemy.getStateTime(),true));
+				sb.draw(FlyEnemyFrame, flyEnemy.getX() * Material.SIZE, flyEnemy.getY() * Material.SIZE);
 			}
 			if(enemy instanceof CactusEnemy){
 				CactusEnemy cactusEnemy = (CactusEnemy) enemy;
-				sb.draw(cactusFrame, cactusEnemy.getX() * Material.SIZE, cactusEnemy.getY() * Material.SIZE, cactusEnemy.getWidth()/2, cactusEnemy.getHeight()/2, cactusEnemy.getWidth(), cactusEnemy.getHeight(),1f,1f,cactusEnemy.getRotation());
+				sb.draw(cactusFrame, cactusEnemy.getX() * Material.SIZE, cactusEnemy.getY() * Material.SIZE);
+				for (Bullet bullet: cactusEnemy.getBulletList()){
+					sb.draw(texture2, bullet.getX(), bullet.getY());
+				}
 			}
 			if(enemy instanceof FirstBoss){
 				FirstBoss firstBoss = (FirstBoss) enemy;
 				bossFrame = (TextureRegion) (firstBoss.isMovingRight()?bossFrameRight:bossFrameLeft);
-				sb.draw(bossFrame, firstBoss.getX() * Material.SIZE, firstBoss.getY() * Material.SIZE, firstBoss.getWidth()/2, firstBoss.getHeight()/2, firstBoss.getWidth(), firstBoss.getHeight(),1f,1f,firstBoss.getRotation());
+				sb.draw(bossFrame, firstBoss.getX() * Material.SIZE, firstBoss.getY() * Material.SIZE);
 			}
 		}
 

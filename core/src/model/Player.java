@@ -8,8 +8,8 @@ public class Player extends RectangleCollider{
 
 	private final static int BASE_DAMAGE = 1;
 	public static final float WALK_FRAME_DURATION = 0.05f;
-	public static final int SPEED = 5;
-	public static final int JUMP_VELOCITY = 2;
+	public static final int SPEED = 6;
+	public static final int JUMP_VELOCITY = 6;
 	public static int HEALTH = 20;
 	private Inventory inventory;
 
@@ -26,7 +26,7 @@ public class Player extends RectangleCollider{
 	private ArrayList<Bullet> bulletList;
 	
 	public Player(float x, float y){
-		super(x, y, 12, 17);
+		super(x, y, 0.99f, 2);
 		position = new Vector2();
 		bulletList = new ArrayList<>();
 		inventory = new Inventory();

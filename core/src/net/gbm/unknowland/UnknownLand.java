@@ -2,18 +2,13 @@ package net.gbm.unknowland;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.FPSLogger;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.utils.ScreenUtils;
 
 import model.Level;
-import model.Material;
 import model.World;
 import screens.AbstractScreen;
 import screens.CreditsScreen;
-import screens.DragAndDropInventory;
 import screens.GameScreen;
 import screens.JoinHostGameScreen;
 import screens.MainMenuScreen;
@@ -49,7 +44,7 @@ public class UnknownLand extends Game {
 	public void create () {
 		batch = new SpriteBatch();
 		camera = new OrthographicCamera();
-		camera.setToOrtho(false, Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 2);
+		camera.setToOrtho(false, 400, 300);
 		camera.update();
 
 		splashScreen = new SplashScreen(this);

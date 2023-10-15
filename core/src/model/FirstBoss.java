@@ -7,8 +7,8 @@ import java.util.List;
 
 public class FirstBoss extends MovingEnemy {
 
-	private static final float ENEMY_SPEED = 25f;
-	private static final float JUMP_SPEED = 200f;
+	private static final float ENEMY_SPEED = 8;
+	private static final float JUMP_SPEED = 200;
 	private Vector2 velocity = new Vector2();
 	private Vector2 acceleration = new Vector2();
 	private static final float ENEMY_SIZE_X = 30f;
@@ -28,7 +28,7 @@ public class FirstBoss extends MovingEnemy {
 	private List<Bullet> bulletList;
 
 	public FirstBoss(float x, float y, int points) {
-		super(x, y, ENEMY_SIZE_X, ENEMY_SIZE_Y, Enemy.FIRST_BOSS, points, FirstBoss.LIFE);
+		super(x, y, 2.99f, 3, Enemy.FIRST_BOSS, points, FirstBoss.LIFE);
 		bulletList = new ArrayList<Bullet>();
 	}
 	

@@ -1,35 +1,27 @@
 package controller;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.maps.MapProperties;
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
-import com.badlogic.gdx.math.Vector2;
-import model.Bullet;
-import model.CactusEnemy;
-import model.Enemy;
-import model.FirstBoss;
-import model.FlyEnemy;
-import model.Item;
-import model.ItemStack;
-import model.JellyEnemy;
-import model.Level;
-import model.MovingEnemy;
-import model.Player;
-import model.Player.State;
-import model.RectangleCollider;
-import model.SnailEnemy;
-import model.World;
-import view.LevelRenderer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+
+import model.Bullet;
+import model.CactusEnemy;
+import model.Enemy;
+import model.FirstBoss;
+import model.FlyEnemy;
+import model.ItemStack;
+import model.JellyEnemy;
+import model.MovingEnemy;
+import model.Player;
+import model.Player.State;
+import model.RectangleCollider;
+import model.World;
 
 /**
  * 
@@ -43,43 +35,21 @@ import java.util.Map;
 
 public class LevelController implements InputProcessor {
 
-	// Maximum movement speed the player can reach
-	private static final float MAX_SPEED = 150f;
-	// Jump speed applied when Jump Button is pressed
-	private static final float JUMP_SPEED = 200f;
-	// Maximum time we spend applying JUMP_SPEED to the player
-	private static final long LONG_JUMP_PRESS = 300l;
 	// Minimum elapsed time between shots
 	private static final long FIRE_TIMER = 750l;
 
-	// Acceleration applied to the player when moving left or right
-	private static final float ACCELERATION = 750f;
 	private float delay = 2.0f;
 	private float timer;
-
-	private static final long TIME_TO_RESTART_LEVEL = 1000l;
-	//private static final long TIME_TO_FINISH_LEVEL = (long) (LevelRenderer.ANIMATION_WIN_DURATION * 1500l);
 
 	private World level;
 	private Player player;
 	private ArrayList<Enemy> creatures;
 
-	private long jumpPressedTime;
-	private boolean jumpingPressed;
-	private float mapHeight;
-	private float mapWidth;
 	private long firePressedTime = System.currentTimeMillis();
-	private long timeOfDeath;
-	private long timeOfFinish;
-	private boolean levelNeedRestart;
 	private boolean levelFinished;
-	
-	//sound effects
-	Sound jumpSound = Gdx.audio.newSound(Gdx.files.internal("sounds/Jump.wav"));
+
 	Sound fireSound = Gdx.audio.newSound(Gdx.files.internal("sounds/Laser1.wav"));
 	Sound coinSound = Gdx.audio.newSound(Gdx.files.internal("sounds/Pickup_Coin.wav"));
-	Sound warpSound = Gdx.audio.newSound(Gdx.files.internal("sounds/Randomize2.wav"));
-	Sound deathSound = Gdx.audio.newSound(Gdx.files.internal("sounds/death.wav"));
 	
 
 	static Map<Integer, Boolean> keys = new HashMap<Integer, Boolean>();
@@ -92,9 +62,6 @@ public class LevelController implements InputProcessor {
 
 	public LevelController(World level) {
 		this.level = level;
-		mapHeight = level.getHeight();
-		mapWidth = level.getWidth();
-		levelNeedRestart = false;
 		player = level.getPlayer();
 		creatures = level.getEnemyList();
 	}
@@ -108,6 +75,9 @@ public class LevelController implements InputProcessor {
 				moveAndUpdateMovingEnemy((JellyEnemy)entity,delta);
 			} else if(entity instanceof CactusEnemy) {
 				moveCactusEnemyBullets((CactusEnemy) entity, player, delta);
+			}
+			else if(entity instanceof FlyEnemy) {
+				moveAndUpdateMovingEnemy((FlyEnemy) entity, delta);
 			}
 			else if(entity instanceof FirstBoss){
 				moveAndUpdateBoss1((FirstBoss) entity, delta);
@@ -344,17 +314,13 @@ public class LevelController implements InputProcessor {
 			// move Bullet
 			bullet.setX(bullet.getX() + (bullet.getVelocity().x * delta));
 			bullet.setY(bullet.getY() + (bullet.getVelocity().y * delta));
-
 			if (bullet.collidesWith(player)) {
+				player.setHEALTH(player.getHEALTH() - 1);
 				iter.remove();
-			}
-			// collide bullet with walls
-
-			if (level.doesRectCollideWithMap(bullet.getX() + 0.6f, bullet.getY(), (int)bullet.getWidth(), (int)bullet.getHeight())) {
-				//iter.remove();
+				continue;
 			}
 			// check if bullet life time is over
-			if (bullet.checkLifeTime())
+			else if (bullet.checkLifeTime())
 				iter.remove();
 		}
 	}
@@ -611,10 +577,6 @@ public class LevelController implements InputProcessor {
 	}
 */
 
-	private void askForLevelToRestart() {
-		Gdx.app.log(getClass().getName(), "Asking for Level to Restart");
-		this.levelNeedRestart = true;
-	}
 	
 	private void notifyLevelFinished() {
 		if (!this.levelFinished){
