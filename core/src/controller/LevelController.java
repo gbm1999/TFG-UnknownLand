@@ -78,12 +78,12 @@ public class LevelController implements InputProcessor {
 			}
 			else if(entity instanceof FlyEnemy) {
 				moveAndUpdateMovingEnemy((FlyEnemy) entity, delta);
+				entity.update(delta);
 			}
 			else if(entity instanceof FirstBoss){
 				moveAndUpdateBoss1((FirstBoss) entity, delta);
 				//moveFirstBossBullets((FirstBoss) moveEnemy, player, delta);
 			}
-			entity.update(delta);
 		}
 		checkCollisionDamage();
 		checkCollisionItem();
