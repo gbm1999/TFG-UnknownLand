@@ -83,6 +83,7 @@ public class LevelController implements InputProcessor {
 				moveAndUpdateBoss1((FirstBoss) entity, delta);
 				//moveFirstBossBullets((FirstBoss) moveEnemy, player, delta);
 			}
+			entity.update(delta);
 		}
 		checkCollisionDamage();
 		checkCollisionItem();
@@ -127,7 +128,7 @@ public class LevelController implements InputProcessor {
 				player.setState(State.WALKING);
 			}
 		}
-		if (keys.get(Keys.RIGHT)){
+		else if (keys.get(Keys.RIGHT)){
 			movePlayer(player,0.6f + player.SPEED * deltaTime , true);
 			player.setFacingLeft(false);
 			if (!player.getState().equals(State.JUMPING)

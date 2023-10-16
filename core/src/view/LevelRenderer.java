@@ -118,8 +118,8 @@ public class LevelRenderer {
 			flyRightFrames[i] = new TextureRegion(flyLeftFrames[i]);
 			flyRightFrames[i].flip(true, false);
 		}
-		flyLeftAnimation = new Animation(0.30f, flyLeftFrames);
-		flyRightAnimation = new Animation(0.30f, flyRightFrames);
+		flyLeftAnimation = new Animation(0.08f, flyLeftFrames);
+		flyRightAnimation = new Animation(0.08f, flyRightFrames);
 
 
 		Pixmap pixmap = new Pixmap(20, 2, Pixmap.Format.RGBA8888);
