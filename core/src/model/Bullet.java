@@ -5,13 +5,12 @@ import com.badlogic.gdx.math.Vector2;
 public class Bullet extends RectangleCollider{
 	
 	public final static float bullet_speed = 200f;
-	public final static float bullet_size = 6f;
 	private final static float maxLifetime = 2.5f;
 	private float lifeTime = 0;
 	private Vector2 velocity = new Vector2();
 	
 	public Bullet(float x, float y, float tileWidth, float tileHeight, float velocityX, float velocityY) {
-		super(x, y, bullet_size, bullet_size);
+		super(x, y, tileWidth, tileHeight);
 		this.velocity.x = velocityX;
 		this.velocity.y = velocityY;
 	}

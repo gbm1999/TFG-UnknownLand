@@ -215,7 +215,7 @@ public class LevelRenderer {
 				CactusEnemy cactusEnemy = (CactusEnemy) enemy;
 				sb.draw(cactusFrame, cactusEnemy.getX() * Material.SIZE, cactusEnemy.getY() * Material.SIZE);
 				for (Bullet bullet: cactusEnemy.getBulletList()){
-					sb.draw(texture2, bullet.getX(), bullet.getY());
+					sb.draw(texture2, bullet.getX() * Material.SIZE, bullet.getY() * Material.SIZE);
 				}
 			}
 			if(enemy instanceof FirstBoss){

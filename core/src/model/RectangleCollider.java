@@ -1,5 +1,8 @@
 package model;
 
+import com.badlogic.gdx.math.Intersector;
+import com.badlogic.gdx.math.Rectangle;
+
 public class RectangleCollider {
 	
 	protected float x;
@@ -43,11 +46,13 @@ public class RectangleCollider {
 	public void setHeight(float height) {
 		this.height = height;
 	}
-	
-	public boolean collidesWith(RectangleCollider rectangleCollider2){
 
-		return x < rectangleCollider2.x + rectangleCollider2.width && y < rectangleCollider2.y + rectangleCollider2.height && x + width > rectangleCollider2.x && y + height > rectangleCollider2.y;
+	public boolean collidesWith(RectangleCollider rectangleCollider2) {
 
+		Rectangle rect1 = new Rectangle(x, y, width, height);
+		Rectangle rect2 = new Rectangle(rectangleCollider2.x, rectangleCollider2.y, rectangleCollider2.width, rectangleCollider2.height);
+
+		return Intersector.overlaps(rect1, rect2);
 	}
 
 	public float getRotation() {

@@ -78,12 +78,12 @@ public class LevelController implements InputProcessor {
 			}
 			else if(entity instanceof FlyEnemy) {
 				moveAndUpdateMovingEnemy((FlyEnemy) entity, delta);
-				entity.update(delta);
 			}
 			else if(entity instanceof FirstBoss){
 				moveAndUpdateBoss1((FirstBoss) entity, delta);
 				//moveFirstBossBullets((FirstBoss) moveEnemy, player, delta);
 			}
+			entity.update(delta);
 		}
 		checkCollisionDamage();
 		checkCollisionItem();
@@ -306,7 +306,7 @@ public class LevelController implements InputProcessor {
 		//Move bullets
 
 		if (cactusEnemy.distanceTo(player) < cactusEnemy.getActionRadius()){
-			cactusEnemy.shoot(player.getX(), player.getY(),1,1);
+			cactusEnemy.shoot(player.getX(), player.getY(),0.1f,0.1f);
 		}
 		Iterator<Bullet> iter = cactusEnemy.getBulletList().iterator();
 		while (iter.hasNext()) {
