@@ -195,7 +195,16 @@ public class LevelController implements InputProcessor {
 					moveEnemy.velocityY += -9.8f * delta * moveEnemy.getWidth();
 					newY += moveEnemy.velocityY * delta;
 
-					moveEnemy.setY(newY);
+					if (level.doesRectCollideWithMap(moveEnemy.getX() + 0.4f, newY, (int)moveEnemy.getWidth(), (int)moveEnemy.getHeight())) {
+						if (moveEnemy.velocityY < 0) {
+							moveEnemy.setY((float) Math.floor(moveEnemy.getY()));
+							moveEnemy.grounded = true;
+						}
+						moveEnemy.velocityY = 0;
+					}
+					else{
+						moveEnemy.setY(newY);
+					}
 				}
 				if (moveEnemy.isMovingRight() && level.doesRectCollideWithMap(newX + 0.6f, newY, (int) moveEnemy.getWidth(), (int) moveEnemy.getHeight())) {
 					if (moveEnemy.grounded)
