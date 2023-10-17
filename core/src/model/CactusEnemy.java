@@ -11,7 +11,7 @@ public class CactusEnemy extends Enemy {
 	private static final float ENEMY_SIZE_Y = 18f;
 	private static final int LIFE = 2;
 	private static final float ACTION_RADIUS = 10f;
-	private static final float FIRE_RATE = 1f; //seconds
+	private static final float FIRE_RATE = 4f; //seconds
 	private Float lastShotTime = null;
 	
 	private List<Bullet> bulletList;

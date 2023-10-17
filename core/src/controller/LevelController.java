@@ -293,7 +293,7 @@ public class LevelController implements InputProcessor {
 				iter.remove();
 				continue;
 			}
-			if (level.doesRectCollideWithMap(bullet.getX() + 0.6f, bullet.getY(), (int)bullet.getWidth(), (int)bullet.getHeight())) {
+			if (level.doesRectCollideWithMap(bullet.getX(), bullet.getY(), (int)bullet.getWidth() +2, (int)bullet.getHeight())) {
 				iter.remove();
 			}
 			// check if bullet life time is over
@@ -319,6 +319,9 @@ public class LevelController implements InputProcessor {
 				player.setHEALTH(player.getHEALTH() - 1);
 				iter.remove();
 				continue;
+			}
+			if (level.doesRectCollideWithMap(bullet.getX(), bullet.getY(), (int)bullet.getWidth()+2, (int)bullet.getHeight())) {
+				iter.remove();
 			}
 			// check if bullet life time is over
 			else if (bullet.checkLifeTime())
