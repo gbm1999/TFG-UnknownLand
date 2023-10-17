@@ -119,8 +119,8 @@ public class World  implements Serializable {
                     e.printStackTrace();
                 }
             }
-            else if (rng.nextDouble() > 0.9){
-                creatures.add(new FlyEnemy(x, getMaxLocationAtX(x), 1 ));
+            else {
+                creatures.add(new FlyEnemy(x, getMaxLocationAtX(x) + 5, 1 ));
             }
 
         }

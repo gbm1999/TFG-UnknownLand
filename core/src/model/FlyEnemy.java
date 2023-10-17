@@ -7,7 +7,7 @@ public class FlyEnemy extends MovingEnemy {
 	private static final int LIFE = 1;
 	
 	public FlyEnemy(float x, float y, int points) {
-		super(x, y,ENEMY_SIZE * 1.5f, ENEMY_SIZE, Enemy.FLY, points, FlyEnemy.LIFE);
+		super(x, y,0.88f, 0.88f, Enemy.FLY, points, FlyEnemy.LIFE);
 	}
 
 	@Override

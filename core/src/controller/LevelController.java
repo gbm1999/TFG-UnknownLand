@@ -106,8 +106,10 @@ public class LevelController implements InputProcessor {
 			}
 			rectangleCollider.velocityY = 0;
 		} else {
-			rectangleCollider.setY(newY);
-			rectangleCollider.grounded = false;
+			if(rectangleCollider.getWidth() != 0.88f) { //flyEnemy no tiene gravedad
+				rectangleCollider.setY(newY);
+				rectangleCollider.grounded = false;
+			}
 		}
 	}
 	protected void movePlayer (Player player,float deltaTime) {
@@ -176,31 +178,43 @@ public class LevelController implements InputProcessor {
 		float newX = moveEnemy.getX();
 		float newY = moveEnemy.getY();
 
-		if(moveEnemy instanceof FirstBoss){
-			if(moveEnemy.getX() < player.getX()){
-				newX = moveEnemy.getX() + 2 * delta;
-				moveEnemy.setMovingRight(true);
-			}
-			else if (moveEnemy.getX() > player.getX()) {
-				newX = moveEnemy.getX() - 2 * delta;
-				moveEnemy.setMovingRight(false);
-			}
-			else{
+		if(moveEnemy instanceof FirstBoss || moveEnemy instanceof FlyEnemy){
+			if (moveEnemy.distanceTo(player) < 6f) {
+				if (moveEnemy.getX() < player.getX()) {
+					newX = moveEnemy.getX() + 2 * delta;
+					moveEnemy.setMovingRight(true);
+				} else if (moveEnemy.getX() > player.getX()) {
+					newX = moveEnemy.getX() - 2 * delta;
+					moveEnemy.setMovingRight(false);
+				} else {
 
+				}
+				if(moveEnemy instanceof FlyEnemy && Math.abs(moveEnemy.getX() - player.getX()) <= 0.2f){
+					newY = moveEnemy.getY();
+
+					moveEnemy.velocityY += -9.8f * delta * moveEnemy.getWidth();
+					newY += moveEnemy.velocityY * delta;
+
+					moveEnemy.setY(newY);
+				}
+				if (moveEnemy.isMovingRight() && level.doesRectCollideWithMap(newX + 0.6f, newY, (int) moveEnemy.getWidth(), (int) moveEnemy.getHeight())) {
+					if (moveEnemy.grounded)
+						moveEnemy.velocityY += moveEnemy.getWidth();
+					else
+						moveEnemy.velocityY += moveEnemy.getWidth() * delta;
+					newX = moveEnemy.getX();
+				}
+				if (!moveEnemy.isMovingRight() && level.doesRectCollideWithMap(newX, newY, (int) moveEnemy.getWidth(), (int) moveEnemy.getHeight())) {
+					if (moveEnemy.grounded)
+						moveEnemy.velocityY += moveEnemy.getWidth();
+					else
+						moveEnemy.velocityY += moveEnemy.getWidth() * delta;
+					newX = moveEnemy.getX();
+				}
 			}
-			if (moveEnemy.isMovingRight() && level.doesRectCollideWithMap(newX + 0.6f, newY, (int)moveEnemy.getWidth(), (int)moveEnemy.getHeight())) {
-				if ( moveEnemy.grounded)
-					moveEnemy.velocityY += moveEnemy.getWidth() ;
-				else
-					moveEnemy.velocityY += moveEnemy.getWidth() * delta;
-				newX = moveEnemy.getX();
-			}
-			if (!moveEnemy.isMovingRight() && level.doesRectCollideWithMap(newX, newY, (int)moveEnemy.getWidth(), (int)moveEnemy.getHeight())) {
-				if ( moveEnemy.grounded)
-					moveEnemy.velocityY += moveEnemy.getWidth() ;
-				else
-					moveEnemy.velocityY += moveEnemy.getWidth() * delta;
-				newX = moveEnemy.getX();
+			else if(moveEnemy instanceof FlyEnemy && (level.doesRectCollideWithMap(moveEnemy.getX(), moveEnemy.getY() - 1, 1, 1) || level.doesRectCollideWithMap(moveEnemy.getX(), moveEnemy.getY(), 0, 0))){
+				moveEnemy.setY(moveEnemy.getY() + 5);
+				moveEnemy.velocityY = 0;
 			}
 		}
 		else{
