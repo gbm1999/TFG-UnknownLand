@@ -54,7 +54,7 @@ public class CreditsScreen extends AbstractScreen{
         resultTable.add(graphics).height(30);
         resultTable.row();
 
-        Label omendez = new Label("***Germán Berná Martínez - Welcome screen", skin);
+        Label omendez = new Label("***German Berna Martinez - We are working on multiplayer", skin);
         omendez.setAlignment(Align.left);
         LabelStyle linkColor = new LabelStyle(omendez.getStyle());
         linkColor.fontColor = new Color(0f,0.5f,1f,1f);
