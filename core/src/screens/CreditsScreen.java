@@ -62,7 +62,7 @@ public class CreditsScreen extends AbstractScreen{
         omendez.addListener( new ClickListener() {
         	@Override
         	public void clicked(InputEvent event, float x, float y) {
-        		Gdx.net.openURI("http://es.linkedin.com/pub/oliver-gonzalez-mendez/67/b95/419");
+        		Gdx.net.openURI("https://www.linkedin.com/in/germán-berná-martínez-62809321a");
         	};
         } );
         resultTable.add(omendez).height(20);
