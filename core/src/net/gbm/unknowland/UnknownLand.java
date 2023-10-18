@@ -36,6 +36,10 @@ public class UnknownLand extends Game {
 		return world;
 	}
 
+	public void setWorld(World world) {
+		this.world = world;
+	}
+
 	private World world;
 
 	private Level selectedLevel;

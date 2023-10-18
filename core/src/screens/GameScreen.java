@@ -135,6 +135,20 @@ public class GameScreen extends AbstractScreen {
         this.unknownLand.getCamera().position.set(this.unknownLand.getSelectedWorld().getPlayer().getX() * Material.SIZE, this.unknownLand.getSelectedWorld().getPlayer().getY() * Material.SIZE, 0);
         this.unknownLand.getCamera().update();
 
+        if(!this.unknownLand.getSelectedWorld().getPlayer().isAlive()){
+            // button Exit
+            Skin skin = super.getSkin();
+            TextButton exitButton = new TextButton("Exit Game", skin);
+
+            // Asegúrate de que exitClickListener esté configurado correctamente para el botón.
+            exitButton.addListener(exitClickListener);
+
+            // Simular un clic automático en el botón de salida
+            exitClickListener.clicked(null, 0, 0);
+            this.unknownLand.setWorld(new World("1",150));
+            this.unknownLand.getSelectedWorld().getPlayer().HEALTH = 20;
+        }
+
         if (Gdx.input.justTouched()){
             Vector3 position = this.unknownLand.getCamera().unproject(new Vector3(Gdx.input.getX() , Gdx.input.getY(), 0));
             Material material = this.unknownLand.getSelectedWorld().getMaterialByLocation(1, position.x, position.y);

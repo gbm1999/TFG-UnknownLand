@@ -124,7 +124,7 @@ public class Player extends RectangleCollider{
 	}
 	
 	public boolean isAlive() {
-		return !getState().equals(State.DYING) && !getState().equals(State.WINNING);
+		return Player.HEALTH > 0;
 	}
 	
 	public int getDamage(){
