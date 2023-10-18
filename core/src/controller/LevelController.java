@@ -320,7 +320,7 @@ public class LevelController implements InputProcessor {
 				iter.remove();
 			}
 			// check if bullet life time is over
-			if (bullet.checkLifeTime())
+			else if (bullet.checkLifeTime())
 				iter.remove();
 		}
 	}
@@ -335,9 +335,6 @@ public class LevelController implements InputProcessor {
 		while (iter.hasNext()) {
 			Bullet bullet = iter.next();
 			bullet.update(delta);
-			// move Bullet
-			bullet.setX(bullet.getX() + (bullet.getVelocity().x * delta));
-			bullet.setY(bullet.getY() + (bullet.getVelocity().y * delta));
 			if (bullet.collidesWith(player)) {
 				player.setHEALTH(player.getHEALTH() - 1);
 				iter.remove();

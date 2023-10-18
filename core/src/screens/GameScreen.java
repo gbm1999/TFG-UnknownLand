@@ -12,7 +12,6 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.List;
@@ -20,21 +19,18 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 
-import controller.LevelController;
-import model.Material;
-import model.Player;
-import model.World;
-
-
 import net.gbm.unknowland.UnknownLand;
 
 import java.util.Random;
+
+import controller.LevelController;
+import model.Material;
+import model.World;
 
 
 public class GameScreen extends AbstractScreen {
@@ -146,6 +142,7 @@ public class GameScreen extends AbstractScreen {
                 System.out.println("Material: " + material.getId() + " " + material.getSymbol() +" " + position.x + " " + position.y);
                 try {
                     this.unknownLand.getSelectedWorld().eraseBlock(position.x, position.y);
+                    this.unknownLand.getSelectedWorld().getPlayer().shoot(position.x / Material.SIZE, position.y / Material.SIZE,0.2f,0.2f);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

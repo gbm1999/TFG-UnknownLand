@@ -24,6 +24,8 @@ public class Player extends RectangleCollider{
     private float stateTime = 0;
 	private boolean facingLeft = false;
 	private ArrayList<Bullet> bulletList;
+	private static final float FIRE_RATE = 4f; //seconds
+	private Float lastShotTime = null;
 	
 	public Player(float x, float y){
 		super(x, y, 0.99f, 1);
@@ -96,6 +98,25 @@ public class Player extends RectangleCollider{
 
 	public ArrayList<Bullet> getBulletList() {
 		return bulletList;
+	}
+
+	public void shoot(float x, float y, float tileWidth, float tileHeight){
+			Vector2 origin;
+
+			origin = new Vector2(this.x,this.y);
+			Vector2 target = new Vector2(x,y);
+			Vector2 direction = target.sub(origin);
+			direction.nor();
+			direction.scl(Player.SPEED);
+			bulletList.add(
+					new Bullet(origin.x,
+							origin.y + 0.2f,
+							tileWidth, tileHeight,direction.x,direction.y));
+			bulletList.add(
+					new Bullet(origin.x + 0.3f,
+							origin.y + 0.3f,
+							tileWidth, tileHeight,direction.x,direction.y));
+
 	}
 
 	public boolean canJump() {

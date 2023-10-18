@@ -33,6 +33,10 @@ public class Bullet extends RectangleCollider{
 	
 	public void update (float delta){
 		lifeTime += delta;
+
+		// Mueve la bala en función de la velocidad.
+		this.x += this.velocity.x * delta;
+		this.y += this.velocity.y * delta;
 	}
 	
 	public boolean checkLifeTime(){
